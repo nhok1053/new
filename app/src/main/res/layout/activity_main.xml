@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+        <import type="android.view.View" />
+
+        <variable
+            name="isLoading"
+            type="boolean"/>
+
+        <variable
+            name="viewModel"
+            type="jp.co.pise.study.presentation.viewmodel.activity.MainActivityViewModel"/>
+    </data>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <android.support.design.widget.AppBarLayout
+            android:id="@+id/appBar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true">
+
+            <include layout="@layout/toolbar" android:id="@+id/toolbar"/>
+
+        </android.support.design.widget.AppBarLayout>
+
+        <RelativeLayout
+            android:layout_below="@id/appBar"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <LinearLayout
+                android:id="@+id/inputContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:orientation="vertical">
+
+                <TextView
+                    android:text="User Id"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+
+                <EditText
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:singleLine="true"
+                    android:enabled="@{!isLoading}"
+                    android:text="@={viewModel.userId}"/>
+
+                <TextView
+                    android:text="Password"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+
+                <EditText
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:singleLine="true"
+                    android:enabled="@{!isLoading}"
+                    android:text="@={viewModel.password}"/>
+
+                <Button
+                    android:text="Login"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:enabled="@{!isLoading}"
+                    android:onClick="@{view -> viewModel.login()}"/>
+
+                <Button
+                    android:text="Skip"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:enabled="@{!isLoading}"
+                    android:onClick="@{view -> viewModel.skip()}"/>
+
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/resultText"
+                android:textSize="20dp"
+                android:layout_below="@id/inputContainer"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@{viewModel.result}"/>
+
+            <TextView
+                android:id="@+id/messageText"
+                android:textSize="20dp"
+                android:layout_below="@id/resultText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@{viewModel.message}"/>
+
+            <TextView
+                android:id="@+id/tokenText"
+                android:textSize="20dp"
+                android:layout_below="@id/messageText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@{viewModel.token}"/>
+
+        </RelativeLayout>
+
+        <ProgressBar
+            android:layout_centerInParent="true"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="@{isLoading ? View.VISIBLE : View.GONE}"/>
+
+    </RelativeLayout>
+</layout>
