@@ -1,5 +1,7 @@
 package jp.co.pise.studyapp.definition
 
+import android.text.TextUtils
+
 object ApiConfig {
     const val REQUEST_METHOD_GET = "GET"
     const val REQUEST_METHOD_POST = "POST"
@@ -21,6 +23,14 @@ object ApiConfig {
 
     const val HEADER_AUTHORIZATION_KEY = "Authorization"
     const val AUTHORIZATION_SCHEMA = "Bearer "
+
+    fun authorizationValue(accessToken: String): String? {
+        var result: String? = null
+        if (!TextUtils.isEmpty(accessToken)) {
+            result = AUTHORIZATION_SCHEMA + accessToken
+        }
+        return result
+    }
 }
 
 object DbConfig {

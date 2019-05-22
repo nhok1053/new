@@ -19,7 +19,7 @@ abstract class BaseRepository : IRepository {
     fun <T : ApiResultModel> Response<T>.validate(): Boolean {
         val body = this.body()
         return (this.isSuccessful && this.code() == HttpURLConnection.HTTP_OK
-                && body != null && body.getResultCode() === ApiResultCode.Success)
+                && body != null && body.apiResultCode == ApiResultCode.Success)
     }
 
     fun <T : ApiResultModel> SingleEmitter<*>.onSafeError(@NonNull response: Response<T>) {
@@ -45,7 +45,7 @@ abstract class BaseRepository : IRepository {
 
         when (this.code()) {
             HttpURLConnection.HTTP_OK -> if (body != null) {
-                resultCode = body.getResultCode().convert()
+                resultCode = body.apiResultCode.convert()
             } else {
                 resultCode = ResultCode.InternalError
             }
@@ -112,33 +112,39 @@ enum class ApiResultCode private constructor(val value: Int) {
 abstract class ApiResultModel {
     @Json(name = "resultCode")
     var resultCode: Int = ApiResultCode.InternalError.value
+        protected set
 
     @Json(name = "errorMessage")
     var errorMessage: String? = null
+        protected set
 
-    fun getResultCode(): ApiResultCode {
-        return ApiResultCode.findByValue(resultCode)
-    }
+    val apiResultCode = ApiResultCode.findByValue(resultCode)
 }
 
-class ProductItemApiModel {
+open class ProductItemApiModel {
     @Json(name = "id")
     lateinit var id: String
+        protected set
 
     @Json(name = "name")
     var name: String? = null
+        protected set
 
     @Json(name = "description")
     var description: String? = null
+        protected set
 
     @Json(name = "imageUrl")
     var imageUrl: String? = null
+        protected set
 
     @Json(name = "priceWithoutTax")
     var priceWithoutTax: Int = 0
+        protected set
 
     @Json(name = "priceInTax")
     var priceInTax: Int = 0
+        protected set
 
     fun convert(): ProductItemModel {
         return ProductItemModel(
@@ -154,37 +160,49 @@ class ProductItemApiModel {
 open class CouponItemApiModel {
     @Json(name = "id")
     lateinit var id: String
+        protected set
 
     @Json(name = "name")
     var name: String? = null
+        protected set
 
     @Json(name = "imageUrl")
     var imageUrl: String? = null
+        protected set
 
     @Json(name = "description")
     var description: String? = null
+        protected set
 
     @Json(name = "priceWithoutTax")
     var priceWithoutTax: Int = 0
+        protected set
 
     @Json(name = "priceInTax")
     var priceInTax: Int = 0
+        protected set
 
     @Json(name = "productPriceWithoutTax")
     var productPriceWithoutTax: Int = 0
+        protected set
 
     @Json(name = "productPriceInTax")
     var productPriceInTax: Int = 0
+        protected set
 
     @Json(name = "startDate")
     var startDate: String? = null
+        protected set
 
     @Json(name = "endDate")
     var endDate: String? = null
+        protected set
 
     @Json(name = "usedLimit")
     var usedLimit: Int = 0
+        protected set
 
     @Json(name = "sortOrder")
     var sortOrder: Int = 0
+        protected set
 }

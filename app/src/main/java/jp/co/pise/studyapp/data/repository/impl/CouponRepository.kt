@@ -147,11 +147,12 @@ class CouponRepository @Inject constructor(private val couponApi: CouponApiInter
     class GetCouponApiResult : ApiResultModel() {
         @Json(name = "coupons")
         var coupons: List<GetCouponItemApiModel>? = null
+            private set
 
         fun convert(): GetCouponResult {
             var items: List<GetCouponItemModel> = ArrayList()
-            if (this.coupons != null) {
-                items = Observable.fromIterable(this.coupons)
+            this.coupons?.apply {
+                items = Observable.fromIterable(this)
                         .map { it.convert() }
                         .toList().blockingGet()
             }
@@ -162,6 +163,7 @@ class CouponRepository @Inject constructor(private val couponApi: CouponApiInter
     class GetCouponItemApiModel : CouponItemApiModel() {
         @Json(name = "usedCount")
         var usedCount: Int? = null
+            private set
 
         fun convert(): GetCouponItemModel {
             return GetCouponItemModel(
@@ -192,10 +194,12 @@ class CouponRepository @Inject constructor(private val couponApi: CouponApiInter
 
     class UseCouponApiResult : ApiResultModel() {
         @Json(name = "couponId")
-        lateinit var couponId: String
+        var couponId: String? = null
+            private set
 
         @Json(name = "usedCount")
         var usedCount: Int = 0
+            private set
 
         fun convert(): UseCouponResult {
             return UseCouponResult(
@@ -215,6 +219,7 @@ class CouponRepository @Inject constructor(private val couponApi: CouponApiInter
     class GetUsedCouponApiResult : ApiResultModel() {
         @Json(name = "usedCoupons")
         var usedCoupons: List<GetUsedCouponItemApiModel>? = null
+            private set
 
         fun convert(): GetUsedCouponResult {
             var items: List<GetUsedCouponItemModel> = ArrayList()
@@ -230,6 +235,7 @@ class CouponRepository @Inject constructor(private val couponApi: CouponApiInter
     class GetUsedCouponItemApiModel : CouponItemApiModel() {
         @Json(name = "usedTime")
         lateinit var usedTime: String
+            private set
 
         fun convert(): GetUsedCouponItemModel {
             return GetUsedCouponItemModel(

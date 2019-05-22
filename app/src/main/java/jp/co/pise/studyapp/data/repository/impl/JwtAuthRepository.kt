@@ -25,7 +25,7 @@ abstract class JwtAuthRepository constructor(val userApi: UserApiInterface, val 
     protected fun <M : JwtAuthChallengeModel, R : ApiResultModel> ((M) -> Single<R>).callWithTokenRefresh(model: M): Single<R> {
         return Single.create { emitter ->
             this(model).subscribe({ result ->
-                if (result.getResultCode() === ApiResultCode.TokenExpired) {
+                if (result.apiResultCode === ApiResultCode.TokenExpired) {
                     this.refreshAndRetry(emitter, model)
                 } else {
                     emitter.onSuccess(result)
@@ -56,11 +56,11 @@ abstract class JwtAuthRepository constructor(val userApi: UserApiInterface, val 
     private fun <M : JwtAuthChallengeModel, R : ApiResultModel> ((M) -> Single<R>).refreshAndRetry(emitter: SingleEmitter<R>, model: M) {
         doRefreshToken(model).subscribe({ refreshTokenResult ->
             try {
-                if (refreshTokenResult.getResultCode() === ApiResultCode.Success) {
+                if (refreshTokenResult.apiResultCode === ApiResultCode.Success) {
                     model.accessToken = refreshTokenResult.accessToken!!
                     this(model).subscribe(emitter::onSuccess, emitter::onSafeError).addBug(subscriptions)
                 } else {
-                    emitter.onSafeError(refreshTokenResult.getResultCode())
+                    emitter.onSafeError(refreshTokenResult.apiResultCode)
                 }
             } catch (e: Exception) {
                 emitter.onError(e)
@@ -77,7 +77,7 @@ abstract class JwtAuthRepository constructor(val userApi: UserApiInterface, val 
         return refreshToken().flatMap { refreshTokenResult ->
             Single.create<RefreshTokenApiResult> { emitter ->
                 try {
-                    if (refreshTokenResult.getResultCode() == ApiResultCode.Success) {
+                    if (refreshTokenResult.apiResultCode == ApiResultCode.Success) {
                         val challenge = SaveTokenChallenge(
                                 model.id,
                                 refreshTokenResult.accessToken!!,
@@ -85,7 +85,7 @@ abstract class JwtAuthRepository constructor(val userApi: UserApiInterface, val 
 
                         saveToken(challenge).subscribe({ emitter.onSuccess(refreshTokenResult) }, emitter::onSafeError).addBug(this.subscriptions)
                     } else {
-                        emitter.onSafeError(refreshTokenResult.getResultCode())
+                        emitter.onSafeError(refreshTokenResult.apiResultCode)
                     }
                 } catch (e: Exception) {
                     emitter.onSafeError(e)
@@ -148,32 +148,33 @@ abstract class JwtAuthRepository constructor(val userApi: UserApiInterface, val 
     }
 }
 
-fun getAuthorizationValue(accessToken: String): String? {
-    var result: String? = null
-    if (!TextUtils.isEmpty(accessToken)) {
-        result = ApiConfig.AUTHORIZATION_SCHEMA + accessToken
-    }
-    return result
-}
-
 // region <----- models ----->
 
-abstract class JwtAuthChallengeModel(@Transient internal val id: String,
-                                     @Transient internal var accessToken: String) {
+abstract class JwtAuthChallengeModel(
+        @Transient val id: String,
+        @Transient var accessToken: String) {
 
-    internal val authorizationValue: String?
-        get() = getAuthorizationValue(this.accessToken)
+    val authorizationValue: String?
+        get() = ApiConfig.authorizationValue(this.accessToken)
 }
 
 class RefreshTokenApiChallenge(@Json(name = "accessToken") val accessToken: String,
-                                       @Json(name = "refreshToken") val refreshToken: String)
+                               @Json(name = "refreshToken") val refreshToken: String)
 
-class RefreshTokenApiResult(@Json(name = "accessToken") val accessToken: String? = null,
-                                    @Json(name = "refreshToken") val refreshToken: String? = null) : ApiResultModel()
+class RefreshTokenApiResult : ApiResultModel() {
+
+    @Json(name = "accessToken")
+    var accessToken: String? = null
+        private set
+
+    @Json(name = "refreshToken")
+     var refreshToken: String? = null
+        private set
+}
 
 class SaveTokenChallenge(val id: String,
-                                 val accessToken: String,
-                                 val refreshToken: String)
+                         val accessToken: String,
+                         val refreshToken: String)
 
 class SaveTokenResult
 

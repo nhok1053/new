@@ -45,7 +45,7 @@ class GetCouponItemModel(id: String,
 class UseCouponChallenge(val couponId: String,
                          @NonNull loginUser: LoginUser) : LoggedInProcessChallengeModel(loginUser)
 
-class UseCouponResult(val couponId: String,
+class UseCouponResult(val couponId: String?,
                       val usedCount: Int) : ProcessResultModel()
 
 class GetUsedCouponChallenge(@NonNull loginUser: LoginUser) : LoggedInProcessChallengeModel(loginUser)
