@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/usedCoupon"
+        android:icon="@android:drawable/ic_menu_my_calendar"
+        android:title="@string/used_coupon_menu_title" />
+    <item
+        android:id="@+id/privacyPolicy"
+        android:icon="@android:drawable/ic_menu_myplaces"
+        android:title="@string/privacy_policy_menu_title" />
+    <item
+        android:id="@+id/licenses"
+        android:icon="@android:drawable/ic_menu_save"
+        android:title="@string/licenses_menu_title" />
+    <item
+        android:id="@+id/logout"
+        android:icon="@android:drawable/ic_menu_delete"
+        android:title="@string/logout_menu_title" />
+    <item
+        android:id="@+id/refreshCoupon"
+        android:icon="@android:drawable/ic_menu_delete"
+        android:title="@string/refresh_coupon_menu_title" />
+
+</menu>

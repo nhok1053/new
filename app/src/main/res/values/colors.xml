@@ -1,6 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#3F51B5</color>
-    <color name="colorPrimaryDark">#303F9F</color>
-    <color name="colorAccent">#FF4081</color>
+    <color name="colorPrimary">#141414</color>
+    <color name="colorPrimaryDark">#090909</color>
+    <color name="background">#353535</color>
+
+    <color name="textPrimary">#A39B62</color>
+    <color name="textSecondary">#A39B62</color>
+
+    <color name="tabSelected">#A39B62</color>
+    <color name="tabUnSelected">#575757</color>
+
+    <color name="menuScrim">#33DDDDDD</color>
+
+    <color name="colorAccent">#A39B62</color>
+
+    <color name="rippleColor">#FFFFFF</color>
+    <color name="buttonPrimary">#A39B62</color>
+    <color name="buttonDisable">#80A39B62</color>
+    <color name="buttonText">#FFFFFF</color>
 </resources>

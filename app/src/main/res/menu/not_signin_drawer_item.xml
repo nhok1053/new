@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/privacyPolicy"
+        android:icon="@android:drawable/ic_menu_myplaces"
+        android:title="@string/privacy_policy_menu_title" />
+    <item
+        android:id="@+id/licenses"
+        android:icon="@android:drawable/ic_menu_save"
+        android:title="@string/licenses_menu_title" />
+    <item
+        android:id="@+id/login"
+        android:icon="@android:drawable/ic_menu_delete"
+        android:title="@string/login_menu_title" />
+
+</menu>

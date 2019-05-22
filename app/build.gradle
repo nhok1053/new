@@ -11,14 +11,14 @@ android {
     flavorDimensions "default"
 
     defaultConfig {
-        applicationId "jp.co.kotlintemplate"
+        applicationId "jp.co.pise.studyapp"
         minSdkVersion 21
         targetSdkVersion 28
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
-        buildConfigField 'String', 'URL_BASE', '"http://your.url.base/"'
+        buildConfigField 'String', 'URL_BASE', '"https://pise-study.azurewebsites.net/"'
     }
 
     signingConfigs {
@@ -47,11 +47,9 @@ android {
     productFlavors {
         develop {
             applicationIdSuffix ".dev"
-            buildConfigField 'String', 'URL_BASE', '"http://your.url.base/"'
         }
         staging {
             applicationIdSuffix ".stg"
-            buildConfigField 'String', 'URL_BASE', '"http://your.url.base/"'
         }
         product {}
     }
@@ -61,6 +59,11 @@ android {
     }
 
     kotlin { experimental { coroutines "enable" } }
+
+    lintOptions {
+        disable 'GoogleAppIndexingWarning'
+        baseline file("lint-baseline.xml")
+    }
 }
 
 ext.coroutines_version = "1.0.1"
@@ -97,6 +100,10 @@ dependencies {
     implementation 'com.android.support:support-v4:28.0.0'
     kapt "android.arch.lifecycle:compiler:$arch_version"
 
+    // rxjava
+    implementation "io.reactivex.rxjava2:rxjava:2.2.6"
+    implementation 'io.reactivex.rxjava2:rxandroid:2.1.1'
+
     // dagger
     implementation "com.google.dagger:dagger:$dagger_version"
     implementation "com.google.dagger:dagger-android:$dagger_version"
@@ -118,6 +125,9 @@ dependencies {
     // orma
     implementation "com.github.maskarade.android.orma:orma:$orma_version"
     kapt "com.github.maskarade.android.orma:orma-processor:$orma_version"
+
+    // fresco
+    implementation 'com.facebook.fresco:fresco:1.13.0'
 
     // glide
     implementation "com.github.bumptech.glide:glide:$glide_version"

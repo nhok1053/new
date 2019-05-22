@@ -1,38 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          package="jp.co.pise.study">
+          package="jp.co.pise.studyapp">
 
     <uses-permission android:name="android.permission.INTERNET"/>
 
     <application
-        android:name="jp.co.pise.study.presentation.App"
+        android:name="jp.co.pise.studyapp.presentation.App"
         android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
-        android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name="jp.co.pise.study.presentation.view.activity.MainActivity">
+        <activity
+            android:name="jp.co.pise.studyapp.presentation.view.activity.SplashActivity"
+            android:screenOrientation="portrait"
+            android:launchMode="singleTask">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
-                <category android:name="android.intent.category.LAUNCHER"/>
-            </intent-filter>
 
-            <!-- Deep Link [ ktln://main ] でMainActivityに遷移 -->
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW"/>
-                <category android:name="android.intent.category.DEFAULT"/>
-                <category android:name="android.intent.category.BROWSABLE"/>
-                <data android:host="main" android:scheme="ktln"/>
-            </intent-filter>
-        </activity>
-        <activity android:name="jp.co.pise.study.presentation.view.activity.SecondActivity">
-            <!-- Deep Link [ ktln://main/second ] でSecondActivityに遷移 -->
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW"/>
-                <category android:name="android.intent.category.DEFAULT"/>
-                <category android:name="android.intent.category.BROWSABLE"/>
-                <data android:host="main" android:scheme="ktln" android:pathPrefix="/second"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
     </application>
