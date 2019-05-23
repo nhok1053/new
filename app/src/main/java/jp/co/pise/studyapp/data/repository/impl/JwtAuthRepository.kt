@@ -12,28 +12,32 @@ import jp.co.pise.studyapp.extension.addBug
 import jp.co.pise.studyapp.extension.onSafeError
 import jp.co.pise.studyapp.framework.retrofit.UserApiInterface
 import jp.co.pise.studyapp.presentation.StudyAppException
+import retrofit2.Response
+import java.net.HttpURLConnection
 
 abstract class JwtAuthRepository constructor(val userApi: UserApiInterface, val db: OrmaDatabase) : BaseRepository() {
     /**
      *
-     * @param func Apiをコールする関数
      * @param model Apiのコールに使用するModel
      * @param <M> funcの引数の型
      * @param <R> Apiの返却の型
      * @return funcを実施した結果がトークン期限切れの場合、トークンをリフレッシュしてから再度更新するSingle
     </R></M> */
-    protected fun <M : JwtAuthChallengeModel, R : ApiResultModel> ((M) -> Single<R>).callWithTokenRefresh(model: M): Single<R> {
+    protected fun <M : JwtAuthChallengeModel, R : ApiResultModel> ((M) -> Single<Response<R>>).callWithTokenRefresh(model: M): Single<Response<R>> {
         return Single.create { emitter ->
-            this(model).subscribe({ result ->
-                if (result.apiResultCode === ApiResultCode.TokenExpired) {
-                    this.refreshAndRetry(emitter, model)
+            this(model).subscribe({
+                val body = it.body()
+                if (it.code() == HttpURLConnection.HTTP_UNAUTHORIZED
+                        || body?.apiResultCode == ApiResultCode.TokenExpired) {
+
+                    emitter.refreshAndRetry(this, model)
                 } else {
-                    emitter.onSuccess(result)
+                    emitter.onSuccess(it)
                 }
             }, { t ->
                 if (t is StudyAppException) {
                     if (t.resultCode === ResultCode.LoginExpired) {
-                        this.refreshAndRetry(emitter, model)
+                        emitter.refreshAndRetry(this, model)
                     } else {
                         emitter.onSafeError(t)
                     }
@@ -45,7 +49,7 @@ abstract class JwtAuthRepository constructor(val userApi: UserApiInterface, val 
     }
 
     /**
-     * トークンをリフレッシュしてfuncを再度実施するメソッド
+     * トークンをリフレッシュしてblockを再度実施するメソッド
      *
      * @param emitter 結果を通知するSingleEmitter
      * @param func Apiをコールする関数
@@ -53,73 +57,69 @@ abstract class JwtAuthRepository constructor(val userApi: UserApiInterface, val 
      * @param <M> funcの引数の型
      * @param <R> Apiの返却の型
     </R></M> */
-    private fun <M : JwtAuthChallengeModel, R : ApiResultModel> ((M) -> Single<R>).refreshAndRetry(emitter: SingleEmitter<R>, model: M) {
-        doRefreshToken(model).subscribe({ refreshTokenResult ->
+    private fun <M : JwtAuthChallengeModel, R : ApiResultModel> SingleEmitter<Response<R>>.refreshAndRetry(block: (M) -> Single<Response<R>>, model: M) {
+        refreshToken(model).subscribe({ refreshTokenResult ->
             try {
                 if (refreshTokenResult.apiResultCode === ApiResultCode.Success) {
                     model.accessToken = refreshTokenResult.accessToken!!
-                    this(model).subscribe(emitter::onSuccess, emitter::onSafeError).addBug(subscriptions)
+                    block(model).subscribe(this::onSuccess, this::onSafeError).addBug(subscriptions)
                 } else {
-                    emitter.onSafeError(refreshTokenResult.apiResultCode)
+                    this.onSafeError(refreshTokenResult.apiResultCode)
                 }
             } catch (e: Exception) {
-                emitter.onError(e)
+                this.onSafeError(e)
             }
-        }, emitter::onSafeError).addBug(subscriptions)
+        }, this::onSafeError).addBug(subscriptions)
     }
 
     /**
      * トークン更新処理
      * ※refreshTokenのAPIをコールし、DBへ保存する
-     * @return トークンリフレッシュ結果を通知するObservable
+     * @return APIのコール結果
      */
-    private fun <M : JwtAuthChallengeModel> doRefreshToken(model: M): Single<RefreshTokenApiResult> {
-        return refreshToken().flatMap { refreshTokenResult ->
-            Single.create<RefreshTokenApiResult> { emitter ->
+    private fun <M : JwtAuthChallengeModel> refreshToken(model: M): Single<RefreshTokenApiResult> =
+            Single.create<Response<RefreshTokenApiResult>> { emitter ->
                 try {
-                    if (refreshTokenResult.apiResultCode == ApiResultCode.Success) {
-                        val challenge = SaveTokenChallenge(
-                                model.id,
-                                refreshTokenResult.accessToken!!,
-                                refreshTokenResult.refreshToken!!)
-
-                        saveToken(challenge).subscribe({ emitter.onSuccess(refreshTokenResult) }, emitter::onSafeError).addBug(this.subscriptions)
+                    val user = db.selectFromUser().getOrNull(0)
+                    if (user != null && !TextUtils.isEmpty(user.accessToken) && !TextUtils.isEmpty(user.refreshToken)) {
+                        val challenge = RefreshTokenApiChallenge(user.accessToken, user.refreshToken)
+                        this.userApi.refreshToken(challenge).subscribe(emitter::onSuccess, emitter::onSafeError).addBug(this.subscriptions)
                     } else {
-                        emitter.onSafeError(refreshTokenResult.apiResultCode)
+                        emitter.onSafeError(StudyAppException.fromCode(ResultCode.LoginExpired))
                     }
                 } catch (e: Exception) {
                     emitter.onSafeError(e)
                 }
-            }
-        }
-    }
-
-    /**
-     * トークン更新処理
-     * @return APIのコール結果
-     */
-    private fun refreshToken(): Single<RefreshTokenApiResult> {
-        return Single.create<RefreshTokenApiResult> { emitter ->
-            try {
-                val user = db.selectFromUser().getOrNull(0)
-                if (user != null && !TextUtils.isEmpty(user.accessToken) && !TextUtils.isEmpty(user.refreshToken)) {
-
-                    val challenge = RefreshTokenApiChallenge(user.accessToken, user.refreshToken)
-                    this.userApi.refreshToken(challenge).subscribeOn(Schedulers.io()).subscribe({ response ->
+            }.flatMap { response ->
+                Single.create<RefreshTokenApiResult> { emitter ->
+                    try {
                         if (response.validate()) {
                             emitter.onSuccess(response.body()!!)
                         } else {
                             emitter.onSafeError(response)
                         }
-                    }, emitter::onSafeError).addBug(this.subscriptions)
-                } else {
-                    emitter.onSafeError(StudyAppException.fromCode(ResultCode.LoginExpired))
+                    } catch (e: Exception) {
+                        emitter.onSafeError(e)
+                    }
                 }
-            } catch (e: Exception) {
-                emitter.onSafeError(e)
-            }
-        }
-    }
+            }.flatMap { refreshTokenResult ->
+                Single.create<RefreshTokenApiResult> { emitter ->
+                    try {
+                        if (refreshTokenResult.apiResultCode == ApiResultCode.Success) {
+                            val challenge = SaveTokenChallenge(
+                                    model.id,
+                                    refreshTokenResult.accessToken!!,
+                                    refreshTokenResult.refreshToken!!)
+
+                            saveToken(challenge).subscribe({ emitter.onSuccess(refreshTokenResult) }, emitter::onSafeError).addBug(this.subscriptions)
+                        } else {
+                            emitter.onSafeError(refreshTokenResult.apiResultCode)
+                        }
+                    } catch (e: Exception) {
+                        emitter.onSafeError(e)
+                    }
+                }
+            }.subscribeOn(Schedulers.io())
 
     /**
      * トークン情報をDBに保存

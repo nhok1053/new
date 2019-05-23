@@ -15,37 +15,35 @@ import javax.inject.Inject
 
 class ProductRepository @Inject constructor(private val productApi: ProductApiInterface, private val db: OrmaDatabase) : BaseRepository(), IProductRepository {
 
-    override fun getProduct(model: GetProductChallenge): Single<GetProductResult> {
-        return Single.create<GetProductResult> { emitter ->
-            try {
-                this.productApi.getProduct().subscribeOn(Schedulers.io()).subscribe({ response ->
-                    if (response.validate()) {
-                        emitter.onSuccess(response.body()!!.convert())
-                    } else {
-                        emitter.onSafeError(response)
-                    }
-                }, emitter::onSafeError).addBug(this.subscriptions)
-            } catch (e: Exception) {
-                emitter.onSafeError(e)
-            }
-        }
-    }
-
-    override fun saveProduct(model: SaveProductChallenge): Single<SaveProductResult> {
-        return Single.create<SaveProductResult> { emitter ->
-            try {
-                this.db.transactionSync {
-                    this.db.deleteFromProduct().execute()
-                    model.products?.apply {
-                        this.forEach { db.insertIntoProduct(it) }
-                    }
-                    emitter.onSuccess(SaveProductResult())
+    override fun getProduct(model: GetProductChallenge): Single<GetProductResult> =
+            Single.create<GetProductResult> { emitter ->
+                try {
+                    this.productApi.getProduct().subscribeOn(Schedulers.io()).subscribe({ response ->
+                        if (response.validate()) {
+                            emitter.onSuccess(response.body()!!.convert())
+                        } else {
+                            emitter.onSafeError(response)
+                        }
+                    }, emitter::onSafeError).addBug(this.subscriptions)
+                } catch (e: Exception) {
+                    emitter.onSafeError(e)
                 }
-            } catch (e: Exception) {
-                emitter.onSafeError(e)
             }
-        }.subscribeOn(Schedulers.io())
-    }
+
+    override fun saveProduct(model: SaveProductChallenge): Single<SaveProductResult> =
+            Single.create<SaveProductResult> { emitter ->
+                try {
+                    this.db.transactionSync {
+                        this.db.deleteFromProduct().execute()
+                        model.products?.apply {
+                            this.forEach { db.insertIntoProduct(it) }
+                        }
+                        emitter.onSuccess(SaveProductResult())
+                    }
+                } catch (e: Exception) {
+                    emitter.onSafeError(e)
+                }
+            }.subscribeOn(Schedulers.io())
 }
 
 // region <----- models ----->

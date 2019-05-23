@@ -1,6 +1,5 @@
 package jp.co.pise.studyapp.data.repository.impl
 
-import android.text.TextUtils
 import com.squareup.moshi.Json
 import io.reactivex.Observable
 import io.reactivex.Single
@@ -8,127 +7,109 @@ import io.reactivex.schedulers.Schedulers
 import jp.co.pise.studyapp.data.entity.OrmaDatabase
 import jp.co.pise.studyapp.data.repository.*
 import jp.co.pise.studyapp.definition.Constant
-import jp.co.pise.studyapp.definition.ResultCode
 import jp.co.pise.studyapp.definition.Utility
 import jp.co.pise.studyapp.domain.model.*
-import jp.co.pise.studyapp.extension.addBug
 import jp.co.pise.studyapp.extension.onSafeError
 import jp.co.pise.studyapp.framework.retrofit.CouponApiInterface
 import jp.co.pise.studyapp.framework.retrofit.UserApiInterface
-import jp.co.pise.studyapp.presentation.StudyAppException
+import retrofit2.Response
 import java.util.*
 import javax.inject.Inject
 
 class CouponRepository @Inject constructor(private val couponApi: CouponApiInterface, userApi: UserApiInterface, db: OrmaDatabase) : JwtAuthRepository(userApi, db), ICouponRepository {
 
-    override fun getCoupon(): Single<GetCouponResult> {
-        return Single.create<GetCouponResult> { emitter ->
-            try {
-                this.couponApi.getCoupon().subscribeOn(Schedulers.io()).subscribe({ response ->
-                    if (response.validate()) {
-                        emitter.onSuccess(response.body()!!.convert())
-                    } else {
-                        emitter.onSafeError(response)
+    override fun getCoupon(): Single<GetCouponResult> =
+            this.couponApi.getCoupon().subscribeOn(Schedulers.io()).flatMap { response ->
+                Single.create<GetCouponResult> { emitter ->
+                    try {
+                        if (response.validate()) {
+                            emitter.onSuccess(response.body()!!.convert())
+                        } else {
+                            emitter.onSafeError(response)
+                        }
+                    } catch (e: Exception) {
+                        emitter.onSafeError(e)
                     }
-                }, emitter::onSafeError).addBug(this.subscriptions)
-            } catch (e: Exception) {
-                emitter.onSafeError(e)
+                }
             }
-        }
-    }
 
-    override fun getCoupon(model: GetCouponParam): Single<GetCouponResult>
-            = this.doGetCoupon.callWithTokenRefresh(GetCouponApiChallenge.fromModel(model)).map { it.convert() }
+    override fun getCoupon(model: GetCouponParam): Single<GetCouponResult> =
+            this.getCouponApi.callWithTokenRefresh(GetCouponApiChallenge.fromModel(model)).flatMap { response ->
+                Single.create<GetCouponResult> { emitter ->
+                    try {
+                        if (response.validate()) {
+                            emitter.onSuccess(response.body()!!.convert())
+                        } else {
+                            emitter.onSafeError(response)
+                        }
+                    } catch (e: Exception) {
+                        emitter.onSafeError(e)
+                    }
+                }
+            }
 
-    override fun useCoupon(model: UseCouponParam): Single<UseCouponResult>
-            = this.doUseCoupon.callWithTokenRefresh(UseCouponApiChallenge.fromModel(model)).map { it.convert() }
 
-    override fun getUsedCoupon(model: GetUsedCouponParam): Single<GetUsedCouponResult>
-            = this.doGetUsedCoupon.callWithTokenRefresh(GetUsedCouponApiChallenge.fromModel(model)).map { it.convert() }
+    override fun useCoupon(model: UseCouponParam): Single<UseCouponResult> =
+            this.useCouponApi.callWithTokenRefresh(UseCouponApiChallenge.fromModel(model)).flatMap { response ->
+                Single.create<UseCouponResult> { emitter ->
+                    try {
+                        if (response.validate()) {
+                            emitter.onSuccess(response.body()!!.convert())
+                        } else {
+                            emitter.onSafeError(response)
+                        }
+                    } catch (e: Exception) {
+                        emitter.onSafeError(e)
+                    }
+                }
+            }
 
-    override fun refreshUsedCoupon(model: RefreshUsedCouponParam): Single<RefreshUsedCouponResult>
-            = this.doRefreshUsedCoupon.callWithTokenRefresh(RefreshUsedCouponApiChallenge.fromModel(model)).map { it.convert() }
+    override fun getUsedCoupon(model: GetUsedCouponParam): Single<GetUsedCouponResult> =
+            this.getUsedCouponApi.callWithTokenRefresh(GetUsedCouponApiChallenge.fromModel(model)).flatMap { response ->
+                Single.create<GetUsedCouponResult> { emitter ->
+                    try {
+                        if (response.validate()) {
+                            emitter.onSuccess(response.body()!!.convert())
+                        } else {
+                            emitter.onSafeError(response)
+                        }
+                    } catch (e: Exception) {
+                        emitter.onSafeError(e)
+                    }
+                }
+            }
+
+    override fun refreshUsedCoupon(model: RefreshUsedCouponParam): Single<RefreshUsedCouponResult> =
+            this.refreshUsedCouponApi.callWithTokenRefresh(RefreshUsedCouponApiChallenge.fromModel(model)).flatMap { response ->
+                Single.create<RefreshUsedCouponResult> { emitter ->
+                    try {
+                        if (response.validate()) {
+                            emitter.onSuccess(response.body()!!.convert())
+                        } else {
+                            emitter.onSafeError(response)
+                        }
+                    } catch (e: Exception) {
+                        emitter.onSafeError(e)
+                    }
+                }
+            }
 
     // region <----- process ----->
 
-    private val doGetCoupon: (model: GetCouponApiChallenge) -> Single<GetCouponApiResult> = {
-        Single.create { emitter ->
-            try {
-                if (!TextUtils.isEmpty(it.accessToken)) {
-                    this.couponApi.getCoupon(it.authorizationValue).subscribeOn(Schedulers.io()).subscribe({ response ->
-                        if (response.validate()) {
-                            emitter.onSuccess(response.body()!!)
-                        } else {
-                            emitter.onSafeError(response)
-                        }
-                    }, emitter::onSafeError).addBug(this.subscriptions)
-                } else {
-                    emitter.onSafeError(StudyAppException.fromCode(ResultCode.LoginExpired))
-                }
-            } catch (e: Exception) {
-                emitter.onSafeError(e)
-            }
-        }
+    private val getCouponApi: (model: GetCouponApiChallenge) -> Single<Response<GetCouponApiResult>> = {
+        this.couponApi.getCoupon(it.authorizationValue).subscribeOn(Schedulers.io())
     }
 
-    private val doUseCoupon: (model: UseCouponApiChallenge) -> Single<UseCouponApiResult> = {
-        Single.create { emitter ->
-            try {
-                if (!TextUtils.isEmpty(it.accessToken)) {
-                    this.couponApi.useCoupon(it.authorizationValue, it).subscribeOn(Schedulers.io()).subscribe({ response ->
-                        if (response.validate()) {
-                            emitter.onSuccess(response.body()!!)
-                        } else {
-                            emitter.onSafeError(response)
-                        }
-                    }, emitter::onSafeError).addBug(this.subscriptions)
-                } else {
-                    emitter.onSafeError(StudyAppException.fromCode(ResultCode.LoginExpired))
-                }
-            } catch (e: Exception) {
-                emitter.onSafeError(e)
-            }
-        }
+    private val useCouponApi: (model: UseCouponApiChallenge) -> Single<Response<UseCouponApiResult>> = {
+        this.couponApi.useCoupon(it.authorizationValue, it).subscribeOn(Schedulers.io())
     }
 
-    private val doGetUsedCoupon: (model: GetUsedCouponApiChallenge) -> Single<GetUsedCouponApiResult> = {
-        Single.create { emitter ->
-            try {
-                if (!TextUtils.isEmpty(it.accessToken)) {
-                    this.couponApi.getUsedCoupon(it.authorizationValue).subscribeOn(Schedulers.io()).subscribe({ response ->
-                        if (response.validate()) {
-                            emitter.onSuccess(response.body()!!)
-                        } else {
-                            emitter.onSafeError(response)
-                        }
-                    }, emitter::onSafeError).addBug(this.subscriptions)
-                } else {
-                    emitter.onSafeError(StudyAppException.fromCode(ResultCode.LoginExpired))
-                }
-            } catch (e: Exception) {
-                emitter.onSafeError(e)
-            }
-        }
+    private val getUsedCouponApi: (model: GetUsedCouponApiChallenge) -> Single<Response<GetUsedCouponApiResult>> = {
+        this.couponApi.getUsedCoupon(it.authorizationValue).subscribeOn(Schedulers.io())
     }
 
-    private val doRefreshUsedCoupon: (RefreshUsedCouponApiChallenge) -> Single<RefreshUsedCouponApiResult> = {
-        Single.create { emitter ->
-            try {
-                if (!TextUtils.isEmpty(it.accessToken)) {
-                    this.couponApi.refreshUsedCoupon(it.authorizationValue).subscribeOn(Schedulers.io()).subscribe({ response ->
-                        if (response.validate()) {
-                            emitter.onSuccess(response.body()!!)
-                        } else {
-                            emitter.onSafeError(response)
-                        }
-                    }, emitter::onSafeError).addBug(this.subscriptions)
-                } else {
-                    emitter.onSafeError(StudyAppException.fromCode(ResultCode.LoginExpired))
-                }
-            } catch (e: Exception) {
-                emitter.onSafeError(e)
-            }
-        }
+    private val refreshUsedCouponApi: (RefreshUsedCouponApiChallenge) -> Single<Response<RefreshUsedCouponApiResult>> = {
+        this.couponApi.refreshUsedCoupon(it.authorizationValue).subscribeOn(Schedulers.io())
     }
 
     // endregion

@@ -17,38 +17,36 @@ import javax.inject.Inject
 
 class NewsRepository @Inject constructor(private val newsApi: NewsApiInterface, private val db: OrmaDatabase) : BaseRepository(), INewsRepository {
 
-    override fun getNews(): Single<GetNewsResult> {
-        return Single.create<GetNewsResult> { emitter ->
-            try {
-                val disposable = this.newsApi.getNews().subscribeOn(Schedulers.io()).subscribe({ response ->
-                    if (response.validate()) {
-                        emitter.onSuccess(response.body()!!.convert())
-                    } else {
-                        emitter.onSafeError(response)
-                    }
-                }, emitter::onSafeError)
-                this.subscriptions.add(disposable)
-            } catch (e: Exception) {
-                emitter.onSafeError(e)
-            }
-        }
-    }
-
-    override fun saveNews(model: SaveNewsChallenge): Single<SaveNewsResult> {
-        return Single.create<SaveNewsResult> { emitter ->
-            try {
-                this.db.transactionSync {
-                    this.db.deleteFromNews().execute()
-                    model.news?.apply {
-                        this.forEach { db.insertIntoNews(it) }
-                    }
+    override fun getNews(): Single<GetNewsResult> =
+            Single.create<GetNewsResult> { emitter ->
+                try {
+                    val disposable = this.newsApi.getNews().subscribeOn(Schedulers.io()).subscribe({ response ->
+                        if (response.validate()) {
+                            emitter.onSuccess(response.body()!!.convert())
+                        } else {
+                            emitter.onSafeError(response)
+                        }
+                    }, emitter::onSafeError)
+                    this.subscriptions.add(disposable)
+                } catch (e: Exception) {
+                    emitter.onSafeError(e)
                 }
-                emitter.onSuccess(SaveNewsResult())
-            } catch (e: Exception) {
-                emitter.onSafeError(e)
             }
-        }.subscribeOn(Schedulers.io())
-    }
+
+    override fun saveNews(model: SaveNewsChallenge): Single<SaveNewsResult> =
+            Single.create<SaveNewsResult> { emitter ->
+                try {
+                    this.db.transactionSync {
+                        this.db.deleteFromNews().execute()
+                        model.news?.apply {
+                            this.forEach { db.insertIntoNews(it) }
+                        }
+                    }
+                    emitter.onSuccess(SaveNewsResult())
+                } catch (e: Exception) {
+                    emitter.onSafeError(e)
+                }
+            }.subscribeOn(Schedulers.io())
 }
 
 // region <----- models ----->
