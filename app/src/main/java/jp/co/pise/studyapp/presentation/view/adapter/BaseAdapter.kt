@@ -10,17 +10,13 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 import io.reactivex.subjects.PublishSubject
 import io.reactivex.subjects.Subject
-import jp.co.pise.studyapp.framework.rx.Messenger
 import jp.co.pise.studyapp.framework.rx.LoginExpiredMessage
+import jp.co.pise.studyapp.presentation.StudyApp
 import jp.co.pise.studyapp.presentation.viewmodel.BaseViewModel
 
 abstract class BaseAdapter<VM : BaseViewModel, VH : RecyclerView.ViewHolder>(val viewModels: ObservableArrayList<VM>, val owner: LifecycleOwner, val context: Context) : RecyclerView.Adapter<VH>(), Disposable {
-    val onItemClickSubject: Subject<VM> = PublishSubject.create()
-
-    private val messenger = Messenger()
+    private val onItemClickSubject: Subject<VM> = PublishSubject.create()
     protected val subscriptions = CompositeDisposable()
-
-    val onLoginExpired: Observable<LoginExpiredMessage> = this.messenger.register(LoginExpiredMessage::class.java)
 
     private val onListChangedCallback = object : ObservableList.OnListChangedCallback<ObservableList<VM>>() {
         override fun onChanged(sender: ObservableList<VM>) {
@@ -57,7 +53,8 @@ abstract class BaseAdapter<VM : BaseViewModel, VH : RecyclerView.ViewHolder>(val
         return this.onItemClickSubject
     }
 
-    protected fun sendLoginExpired(message: LoginExpiredMessage) = this.messenger.send(message)
+    protected fun loginExpired(message: LoginExpiredMessage) = StudyApp.instance.sendLoginExpired()
+    protected fun itemClick(viewModel: VM) = this.onItemClickSubject.onNext(viewModel)
 
     protected open fun onListItemChange(sender: ObservableList<VM>) {}
     protected open fun onListItemRangeChanged(sender: ObservableList<VM>, positionStart: Int, itemCount: Int) {}

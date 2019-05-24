@@ -127,7 +127,7 @@ class CouponListItemViewModel @Inject constructor(userLogin: UserLogin, private 
 
     companion object {
         fun fromResultItem(model: GetCouponItemModel, isLogin: Boolean, loginUser: LoginUser): CouponListItemViewModel {
-            val viewModel = StudyApp.instance.daggerAppComponent.createCouponListItemViewModel()
+            val viewModel = StudyApp.instance.appComponent.createCouponListItemViewModel()
             viewModel._id = model.id
             viewModel._name.value = model.name
             viewModel._imageUrl.value = model.imageUrl
@@ -176,13 +176,13 @@ class CouponListItemViewModel @Inject constructor(userLogin: UserLogin, private 
                 this._name.value,
                 this._imageUrl.value,
                 this._description.value,
-                this._priceWithoutTax.value ?: 0,
-                this._priceInTax.value ?: 0,
-                this._productPriceWithoutTax.value ?: 0,
-                this._productPriceInTax.value ?: 0,
+                this._priceWithoutTax.value.unwrap,
+                this._priceInTax.value.unwrap,
+                this._productPriceWithoutTax.value.unwrap,
+                this._productPriceInTax.value.unwrap,
                 this._startDate.value,
                 this._endDate.value,
-                this._usedLimit.value ?: 0,
+                this._usedLimit.value.unwrap,
                 this._sortOrder,
                 this._usedCount.value)
     }

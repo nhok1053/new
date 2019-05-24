@@ -8,14 +8,14 @@ import com.facebook.imagepipeline.common.ResizeOptions
 import com.facebook.imagepipeline.request.ImageRequestBuilder
 
 @Throws(Exception::class)
-fun SimpleDraweeView.resizeFromDimen(context: Context, uriStr: String, @DimenRes widthId: Int, @DimenRes heightId: Int) {
+fun SimpleDraweeView.resizeFromDimen(context: Context, uriStr: String?, @DimenRes widthId: Int, @DimenRes heightId: Int) {
     val width = context.resources.getDimension(widthId).toInt()
     val height = context.resources.getDimension(heightId).toInt()
     resize(uriStr, width, height)
 }
 
 @Throws(Exception::class)
-fun SimpleDraweeView.resize(uriStr: String, width: Int, height: Int) {
+fun SimpleDraweeView.resize(uriStr: String?, width: Int, height: Int) {
     val uri = Uri.parse(uriStr)
     val options = ResizeOptions(width, height)
     val request = ImageRequestBuilder.newBuilderWithSource(uri)

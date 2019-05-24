@@ -9,11 +9,10 @@ import dagger.android.AndroidInjector
 import dagger.android.DispatchingAndroidInjector
 import dagger.android.HasActivityInjector
 import dagger.android.support.HasSupportFragmentInjector
-import io.reactivex.Observable
-import io.reactivex.annotations.NonNull
 import jp.co.pise.studyapp.domain.model.LoginUser
 import jp.co.pise.studyapp.framework.dagger.AppComponent
 import jp.co.pise.studyapp.framework.dagger.DaggerAppComponent
+import jp.co.pise.studyapp.framework.rx.LoginExpiredMessage
 import jp.co.pise.studyapp.framework.rx.Messenger
 import jp.co.pise.studyapp.framework.rx.RefreshedUsedCouponMessage
 import jp.co.pise.studyapp.framework.rx.UserLoginStateChangeMessage
@@ -29,7 +28,7 @@ class StudyApp : Application(), HasActivityInjector, HasSupportFragmentInjector 
     @Inject
     lateinit var fragmentInjector: DispatchingAndroidInjector<Fragment>
 
-    lateinit var daggerAppComponent: AppComponent private set
+    lateinit var appComponent: AppComponent private set
     private val messenger = Messenger()
     var loginUser: LoginUser? = null
 
@@ -43,11 +42,11 @@ class StudyApp : Application(), HasActivityInjector, HasSupportFragmentInjector 
     // region <----- initializer ----->
 
     private fun initializeDaggerComponent() {
-        this.daggerAppComponent = DaggerAppComponent
+        this.appComponent = DaggerAppComponent
                 .builder()
                 .application(this)
                 .build()
-        this.daggerAppComponent.inject(this)
+        this.appComponent.inject(this)
     }
 
     private fun initializeFresco() {
@@ -61,13 +60,15 @@ class StudyApp : Application(), HasActivityInjector, HasSupportFragmentInjector 
 
     // region <----- messenger ----->
 
-    fun loginStateChange(): Observable<UserLoginStateChangeMessage> {
-        return this.messenger.register(UserLoginStateChangeMessage::class.java)
-    }
+    fun loginStateChange() = this.messenger.register(UserLoginStateChangeMessage::class.java)
 
-    fun refreshedUsedCoupon(): Observable<RefreshedUsedCouponMessage> {
-        return this.messenger.register(RefreshedUsedCouponMessage::class.java)
-    }
+    fun loginExpired() = this.messenger.register(LoginExpiredMessage::class.java)
+
+    fun refreshedUsedCoupon() = this.messenger.register(RefreshedUsedCouponMessage::class.java)
+
+    fun sendLoginExpired() = this.messenger.send(LoginExpiredMessage())
+
+    fun sendRefreshedUsedCoupon() = this.messenger.send(RefreshedUsedCouponMessage())
 
     // endregion
 
@@ -89,14 +90,6 @@ class StudyApp : Application(), HasActivityInjector, HasSupportFragmentInjector 
 
     fun isLogin(): Boolean {
         return this.loginUser != null
-    }
-
-    // endregion
-
-    // region <----- refresh used coupon ----->
-
-    fun sendRefreshedUsedCoupon() {
-        this.messenger.send(RefreshedUsedCouponMessage())
     }
 
     // endregion
