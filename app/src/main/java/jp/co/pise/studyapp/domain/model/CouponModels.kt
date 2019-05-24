@@ -4,7 +4,7 @@ import io.reactivex.annotations.NonNull
 import java.util.*
 
 class GetCouponChallenge(val isLogin: Boolean,
-                         @NonNull loginUser: LoginUser) : LoggedInProcessChallengeModel(loginUser)
+                         loginUser: LoginUser) : LoggedInProcessChallengeModel(loginUser)
 
 class GetCouponResult(val coupons: List<GetCouponItemModel>?) : ProcessResultModel()
 
@@ -43,12 +43,12 @@ class GetCouponItemModel(id: String,
 }
 
 class UseCouponChallenge(val couponId: String,
-                         @NonNull loginUser: LoginUser) : LoggedInProcessChallengeModel(loginUser)
+                         loginUser: LoginUser) : LoggedInProcessChallengeModel(loginUser)
 
 class UseCouponResult(val couponId: String?,
                       val usedCount: Int) : ProcessResultModel()
 
-class GetUsedCouponChallenge(@NonNull loginUser: LoginUser) : LoggedInProcessChallengeModel(loginUser)
+class GetUsedCouponChallenge(loginUser: LoginUser) : LoggedInProcessChallengeModel(loginUser)
 
 class GetUsedCouponResult(val usedCoupons: List<GetUsedCouponItemModel>? = null) : ProcessResultModel()
 
@@ -86,6 +86,6 @@ class GetUsedCouponItemModel(id: String,
     }
 }
 
-class RefreshUsedCouponChallenge(@NonNull loginUser: LoginUser) : LoggedInProcessChallengeModel(loginUser)
+class RefreshUsedCouponChallenge(loginUser: LoginUser) : LoggedInProcessChallengeModel(loginUser)
 
 class RefreshUsedCouponResult : ProcessResultModel()

@@ -44,11 +44,7 @@ abstract class BaseRepository : IRepository {
         val body = this.body()
 
         when (this.code()) {
-            HttpURLConnection.HTTP_OK -> if (body != null) {
-                resultCode = body.apiResultCode.convert()
-            } else {
-                resultCode = ResultCode.InternalError
-            }
+            HttpURLConnection.HTTP_OK -> resultCode = body?.apiResultCode?.convert() ?: ResultCode.InternalError
             HttpURLConnection.HTTP_UNAUTHORIZED -> resultCode = ResultCode.LoginExpired
         }
 

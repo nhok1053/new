@@ -2,7 +2,7 @@ package jp.co.pise.studyapp.framework.dagger
 
 import android.content.Context
 import dagger.Module
-import jp.co.pise.studyapp.presentation.App
+import jp.co.pise.studyapp.presentation.StudyApp
 import dagger.Provides
 import javax.inject.Singleton
 
@@ -11,7 +11,7 @@ import javax.inject.Singleton
 internal class AppModule {
     @Singleton
     @Provides
-    fun provideContext(application: App): Context {
+    fun provideContext(application: StudyApp): Context {
         return application.applicationContext
     }
 }

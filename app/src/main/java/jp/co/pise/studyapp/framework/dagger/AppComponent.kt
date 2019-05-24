@@ -4,7 +4,8 @@ import dagger.BindsInstance
 import dagger.Component
 import dagger.android.AndroidInjectionModule
 import dagger.android.support.AndroidSupportInjectionModule
-import jp.co.pise.studyapp.presentation.App
+import jp.co.pise.studyapp.presentation.StudyApp
+import jp.co.pise.studyapp.presentation.viewmodel.adapter.CouponListItemViewModel
 import javax.inject.Singleton
 
 @Singleton
@@ -19,17 +20,17 @@ interface AppComponent {
     @Component.Builder
     interface Builder {
         @BindsInstance
-        fun application(application: App): Builder
+        fun application(application: StudyApp): Builder
 
         fun build(): AppComponent
     }
 
     // application
-    fun inject(application: App)
+    fun inject(application: StudyApp)
 
     // custom view
 //    fun inject(drawerHeaderView: DrawerHeaderView)
 
     // view model
-//    fun createCouponListItemViewModel(): CouponListItemViewModel
+    fun createCouponListItemViewModel(): CouponListItemViewModel
 }

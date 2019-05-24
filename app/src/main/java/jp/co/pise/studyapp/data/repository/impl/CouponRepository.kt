@@ -131,11 +131,10 @@ class CouponRepository @Inject constructor(private val couponApi: CouponApiInter
             private set
 
         fun convert(): GetCouponResult {
-            var items: List<GetCouponItemModel> = ArrayList()
-            this.coupons?.apply {
-                items = Observable.fromIterable(this)
-                        .map { it.convert() }
-                        .toList().blockingGet()
+            val items: List<GetCouponItemModel> = if (this.coupons != null) {
+                this.coupons!!.map { it.convert() }
+            } else {
+                ArrayList()
             }
             return GetCouponResult(items)
         }
@@ -203,11 +202,10 @@ class CouponRepository @Inject constructor(private val couponApi: CouponApiInter
             private set
 
         fun convert(): GetUsedCouponResult {
-            var items: List<GetUsedCouponItemModel> = ArrayList()
-            if (this.usedCoupons != null) {
-                items = Observable.fromIterable(this.usedCoupons)
-                        .map { it.convert() }
-                        .toList().blockingGet()
+            var items: List<GetUsedCouponItemModel> = if (this.usedCoupons != null) {
+                this.usedCoupons!!.map { it.convert() }
+            } else {
+                ArrayList()
             }
             return GetUsedCouponResult(items)
         }

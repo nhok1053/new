@@ -57,11 +57,10 @@ class GetNewsApiResult : ApiResultModel() {
         private set
 
     fun convert(): GetNewsResult {
-        var items: List<GetNewsItemModel> = ArrayList()
-        this.news?.apply {
-            items = Observable.fromIterable(this)
-                    .map { it.convert() }
-                    .toList().blockingGet()
+        var items: List<GetNewsItemModel> = if (this.news != null) {
+            this.news!!.map { it.convert() }
+        } else {
+            ArrayList()
         }
         return GetNewsResult(items)
     }

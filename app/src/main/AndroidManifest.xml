@@ -5,7 +5,7 @@
     <uses-permission android:name="android.permission.INTERNET"/>
 
     <application
-        android:name="jp.co.pise.studyapp.presentation.App"
+        android:name="jp.co.pise.studyapp.presentation.StudyApp"
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"

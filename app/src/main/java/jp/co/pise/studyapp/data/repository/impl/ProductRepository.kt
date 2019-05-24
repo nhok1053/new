@@ -1,7 +1,6 @@
 package jp.co.pise.studyapp.data.repository.impl
 
 import com.squareup.moshi.Json
-import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.schedulers.Schedulers
 import jp.co.pise.studyapp.data.entity.OrmaDatabase
@@ -54,11 +53,10 @@ class GetProductApiResult : ApiResultModel() {
         private set
 
     fun convert(): GetProductResult {
-        var items: List<ProductItemModel> = ArrayList()
-        this.products?.apply {
-            items = Observable.fromIterable(this)
-                    .map { it.convert() }
-                    .toList().blockingGet()
+        var items: List<ProductItemModel> = if (this.products != null) {
+            this.products!!.map { it.convert() }
+        } else {
+            ArrayList()
         }
         return GetProductResult(items)
     }
