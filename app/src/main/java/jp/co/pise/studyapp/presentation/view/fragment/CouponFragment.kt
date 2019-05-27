@@ -97,9 +97,6 @@ class CouponFragment : BaseFragment() {
 
         initViewModel()
 
-        if (!this.viewModel.isRefreshing.value.unwrap)
-            this.binding.swipeRefresh.isRefreshing = false
-
         return this.binding.root
     }
 

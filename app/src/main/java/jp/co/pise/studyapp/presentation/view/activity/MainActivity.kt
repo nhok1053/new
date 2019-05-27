@@ -189,24 +189,18 @@ class MainActivity : BaseActivity(),
 
     private fun replaceNewsFragment() {
         this.newsFragment?.dispose()
-        this.newsFragment = null
-
         this.newsFragment = createNewsFragment()
         replaceContainer(this.newsFragment, NewsFragment.TAG, resources.getString(R.string.news_tab_title))
     }
 
     private fun replaceCouponFragment() {
         this.couponFragment?.dispose()
-        this.couponFragment = null
-
         this.couponFragment = createCouponFragment()
         replaceContainer(this.couponFragment, CouponFragment.TAG, resources.getString(R.string.coupon_tab_title))
     }
 
     private fun replaceProductFragment() {
         this.productFragment?.dispose()
-        this.productFragment = null
-
         this.productFragment = createProductFragment()
         replaceContainer(this.productFragment, ProductFragment.TAG, resources.getString(R.string.product_tab_title))
     }

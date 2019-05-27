@@ -85,9 +85,6 @@ class ProductFragment : BaseFragment() {
 
         this.viewModel.initialize()
 
-        if (!this.viewModel.isRefreshing.value.unwrap)
-            this.binding.swipeRefresh.isRefreshing = false
-
         return this.binding.root
     }
 
