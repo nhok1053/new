@@ -10,13 +10,14 @@ import android.view.View
 import android.view.ViewGroup
 import jp.co.pise.studyapp.R
 import jp.co.pise.studyapp.databinding.ItemUsedCouponListBinding
+import jp.co.pise.studyapp.extension.owner
 import jp.co.pise.studyapp.presentation.viewmodel.adapter.UsedCouponListItemViewModel
 
-class UsedCouponListAdapter(viewModels: ObservableArrayList<UsedCouponListItemViewModel>, owner: LifecycleOwner, context: Context) : BaseAdapter<UsedCouponListItemViewModel, UsedCouponListAdapter.ViewHolder>(viewModels, owner, context) {
+class UsedCouponListAdapter(viewModels: ObservableArrayList<UsedCouponListItemViewModel>, owner: LifecycleOwner) : BaseAdapter<UsedCouponListItemViewModel, UsedCouponListAdapter.ViewHolder>(viewModels, owner) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.item_used_coupon_list, parent, false)
-        return ViewHolder(view, owner, this.context)
+        return ViewHolder(view, owner)
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
@@ -36,12 +37,9 @@ class UsedCouponListAdapter(viewModels: ObservableArrayList<UsedCouponListItemVi
         return this.subscriptions.isDisposed
     }
 
-    class ViewHolder(view: View, owner: LifecycleOwner, val context: Context) : RecyclerView.ViewHolder(view) {
-        private val binding: ItemUsedCouponListBinding = DataBindingUtil.bind(view)!!
-
-        init {
-            this.binding.lifecycleOwner = owner
-        }
+    class ViewHolder(view: View, owner: LifecycleOwner) : RecyclerView.ViewHolder(view) {
+        private val binding: ItemUsedCouponListBinding =
+                DataBindingUtil.bind<ItemUsedCouponListBinding>(view)!!.owner(owner)
 
         fun update(viewModel: UsedCouponListItemViewModel) {
             this.binding.viewModel = viewModel

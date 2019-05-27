@@ -1,10 +1,9 @@
 package jp.co.pise.studyapp.domain.model
 
-import io.reactivex.annotations.NonNull
 import java.util.*
 
 class GetCouponChallenge(val isLogin: Boolean,
-                         loginUser: LoginUser) : LoggedInProcessChallengeModel(loginUser)
+                         val loginUser: LoginUser?)
 
 class GetCouponResult(val coupons: List<GetCouponItemModel>?) : ProcessResultModel()
 

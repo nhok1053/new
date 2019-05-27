@@ -10,19 +10,13 @@ class StudyAppException private constructor(t: Throwable?, val resultCode: Resul
     private constructor(resultCode: ResultCode, displayMessage: String?) : this(null, resultCode, displayMessage)
 
     companion object {
-        fun fromThrowable(t: Throwable): StudyAppException {
-            val result: StudyAppException
-            if (t is StudyAppException) {
-                result = t
-            } else {
-                result = StudyAppException(t, ResultCode.InternalError, null)
-            }
-            return result
-        }
+        fun fromThrowable(t: Throwable) =
+                if (t is StudyAppException) {
+                    t
+                } else {
+                    StudyAppException(t, ResultCode.InternalError, null)
+                }
 
-        @JvmOverloads
-        fun fromCode(resultCode: ResultCode, displayMessage: String? = null): StudyAppException {
-            return StudyAppException(resultCode, displayMessage)
-        }
+        fun fromCode(resultCode: ResultCode, displayMessage: String? = null) = StudyAppException(resultCode, displayMessage)
     }
 }

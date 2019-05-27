@@ -11,14 +11,15 @@ import android.view.View
 import android.view.ViewGroup
 import jp.co.pise.studyapp.R
 import jp.co.pise.studyapp.databinding.ItemNewsListBinding
+import jp.co.pise.studyapp.extension.owner
 import jp.co.pise.studyapp.extension.resizeFromDimen
 import jp.co.pise.studyapp.presentation.viewmodel.adapter.NewsListItemViewModel
 
-class NewsListAdapter(viewModels: ObservableArrayList<NewsListItemViewModel>, owner: LifecycleOwner, context: Context) : BaseAdapter<NewsListItemViewModel, NewsListAdapter.ViewHolder>(viewModels, owner, context) {
+class NewsListAdapter(viewModels: ObservableArrayList<NewsListItemViewModel>, owner: LifecycleOwner) : BaseAdapter<NewsListItemViewModel, NewsListAdapter.ViewHolder>(viewModels, owner) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.item_news_list, parent, false)
-        return ViewHolder(view, owner, this.context)
+        return ViewHolder(view, owner)
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
@@ -38,12 +39,9 @@ class NewsListAdapter(viewModels: ObservableArrayList<NewsListItemViewModel>, ow
         return this.subscriptions.isDisposed
     }
 
-    class ViewHolder(view: View, owner: LifecycleOwner, val context: Context) : RecyclerView.ViewHolder(view) {
-        private val binding: ItemNewsListBinding = DataBindingUtil.bind(view)!!
-
-        init {
-            this.binding.lifecycleOwner = owner
-        }
+    class ViewHolder(view: View, owner: LifecycleOwner) : RecyclerView.ViewHolder(view) {
+        private val binding: ItemNewsListBinding =
+                DataBindingUtil.bind<ItemNewsListBinding>(view)!!.owner(owner)
 
         fun update(viewModel: NewsListItemViewModel) {
             this.binding.viewModel = viewModel
@@ -54,7 +52,6 @@ class NewsListAdapter(viewModels: ObservableArrayList<NewsListItemViewModel>, ow
             try {
                 if (!TextUtils.isEmpty(viewModel.imageUrl.value)) {
                     this.binding.image.resizeFromDimen(
-                            this.context,
                             viewModel.imageUrl.value,
                             R.dimen.news_image_width,
                             R.dimen.news_image_height)

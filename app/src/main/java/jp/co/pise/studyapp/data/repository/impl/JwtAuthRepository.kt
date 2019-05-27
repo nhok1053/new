@@ -49,20 +49,19 @@ abstract class JwtAuthRepository constructor(val userApi: UserApiInterface, val 
     }
 
     /**
-     * トークンをリフレッシュしてblockを再度実施するメソッド
+     * トークンをリフレッシュしてfuncを再度実施するメソッド
      *
-     * @param emitter 結果を通知するSingleEmitter
      * @param func Apiをコールする関数
      * @param model Apiのコールに使用するModel
      * @param <M> funcの引数の型
      * @param <R> Apiの返却の型
     </R></M> */
-    private fun <M : JwtAuthChallengeModel, R : ApiResultModel> SingleEmitter<Response<R>>.refreshAndRetry(block: (M) -> Single<Response<R>>, model: M) {
+    private fun <M : JwtAuthChallengeModel, R : ApiResultModel> SingleEmitter<Response<R>>.refreshAndRetry(func: (M) -> Single<Response<R>>, model: M) {
         refreshToken(model).subscribe({ refreshTokenResult ->
             try {
                 if (refreshTokenResult.apiResultCode === ApiResultCode.Success) {
                     model.accessToken = refreshTokenResult.accessToken!!
-                    block(model).subscribe(this::onSuccess, this::onSafeError).addBug(subscriptions)
+                    func(model).subscribe(this::onSuccess, this::onSafeError).addBug(subscriptions)
                 } else {
                     this.onSafeError(refreshTokenResult.apiResultCode)
                 }

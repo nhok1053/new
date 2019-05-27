@@ -33,11 +33,11 @@ class SplashActivityViewModel @Inject constructor(private val userLogin: UserLog
                 { t -> autoLoginError(t) { this._isLoading.postValue(false) } }).addBug(this.subscriptions)
     }
 
-    private fun autoLoginError(throwable: Throwable, block: (() -> Unit)? = null) {
+    private fun autoLoginError(throwable: Throwable, action: (() -> Unit)? = null) {
         if (throwable is StudyAppException) {
             this.onLoginErrorSubject.onNext(throwable)
         }
         this.userLogin.logout().observeOn(AndroidSchedulers.mainThread())
-                .subscribe({ block?.invoke() }, { block?.invoke() }).addBug(this.subscriptions)
+                .subscribe({ action?.invoke() }, { action?.invoke() }).addBug(this.subscriptions)
     }
 }

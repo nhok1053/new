@@ -30,7 +30,18 @@ class StudyApp : Application(), HasActivityInjector, HasSupportFragmentInjector 
 
     lateinit var appComponent: AppComponent private set
     private val messenger = Messenger()
+
     var loginUser: LoginUser? = null
+        private set
+
+    val isLoggedIn get() = this.loginUser != null
+
+    val onLoginStateChange
+            = this.messenger.register(UserLoginStateChangeMessage::class.java)
+    val onLoginExpired
+            = this.messenger.register(LoginExpiredMessage::class.java)
+    val onRefreshedUsedCoupon
+            = this.messenger.register(RefreshedUsedCouponMessage::class.java)
 
     override fun onCreate() {
         super.onCreate()
@@ -60,12 +71,6 @@ class StudyApp : Application(), HasActivityInjector, HasSupportFragmentInjector 
 
     // region <----- messenger ----->
 
-    fun loginStateChange() = this.messenger.register(UserLoginStateChangeMessage::class.java)
-
-    fun loginExpired() = this.messenger.register(LoginExpiredMessage::class.java)
-
-    fun refreshedUsedCoupon() = this.messenger.register(RefreshedUsedCouponMessage::class.java)
-
     fun sendLoginExpired() = this.messenger.send(LoginExpiredMessage())
 
     fun sendRefreshedUsedCoupon() = this.messenger.send(RefreshedUsedCouponMessage())
@@ -86,10 +91,6 @@ class StudyApp : Application(), HasActivityInjector, HasSupportFragmentInjector 
             this.loginUser = null
             this.messenger.send(UserLoginStateChangeMessage(false))
         }
-    }
-
-    fun isLogin(): Boolean {
-        return this.loginUser != null
     }
 
     // endregion

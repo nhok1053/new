@@ -12,7 +12,7 @@ abstract class LoginOperationViewModel(protected var userLogin: UserLogin) : Bas
     val onLoginExpired: Observable<LoginExpiredMessage> = this.messenger.register(LoginExpiredMessage::class.java)
     val onUserNotLoggedIn: Observable<UserNotLoggedInMessage> = this.messenger.register(UserNotLoggedInMessage::class.java)
 
-    protected fun checkLoginExpired(throwable: Throwable, block: (() -> Unit)? = null) {
+    protected fun checkLoginExpired(throwable: Throwable, action: (() -> Unit)? = null) {
         try {
             if (throwable is StudyAppException) {
                 when (throwable.resultCode) {
@@ -20,15 +20,15 @@ abstract class LoginOperationViewModel(protected var userLogin: UserLogin) : Bas
                             .observeOn(AndroidSchedulers.mainThread())
                             .subscribe(
                                     {
-                                        block?.invoke()
+                                        action?.invoke()
                                         sendLoginExpiredMessage()
                                     },
                                     {
-                                        block?.invoke()
+                                        action?.invoke()
                                         sendLoginExpiredMessage()
                                     }))
 
-                    else -> block?.invoke()
+                    else -> action?.invoke()
                 }
             }
         } catch (e: Exception) {

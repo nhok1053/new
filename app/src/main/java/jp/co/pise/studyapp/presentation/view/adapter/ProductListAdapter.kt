@@ -15,17 +15,18 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import jp.co.pise.studyapp.R
 import jp.co.pise.studyapp.databinding.ItemProductListBinding
 import jp.co.pise.studyapp.extension.addBug
+import jp.co.pise.studyapp.extension.owner
 import jp.co.pise.studyapp.extension.resizeFromDimen
 import jp.co.pise.studyapp.presentation.viewmodel.adapter.ProductListItemViewModel
 
-class ProductListAdapter(viewModels: ObservableArrayList<ProductListItemViewModel>, owner: LifecycleOwner, context: Context) : BaseAdapter<ProductListItemViewModel, ProductListAdapter.ViewHolder>(viewModels, owner, context) {
+class ProductListAdapter(viewModels: ObservableArrayList<ProductListItemViewModel>, owner: LifecycleOwner) : BaseAdapter<ProductListItemViewModel, ProductListAdapter.ViewHolder>(viewModels, owner) {
     init {
         this.viewModels.forEach { this.setShowDetailCommand(it) }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.item_product_list, parent, false)
-        return ViewHolder(view, owner, this.context)
+        return ViewHolder(view, owner)
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
@@ -38,15 +39,9 @@ class ProductListAdapter(viewModels: ObservableArrayList<ProductListItemViewMode
 
     override fun onListItemRangeInserted(sender: ObservableList<ProductListItemViewModel>, positionStart: Int, itemCount: Int) {
         super.onListItemRangeInserted(sender, positionStart, itemCount)
-        val disposable = Observable.range(positionStart, itemCount).forEach { index ->
-            if (index < sender.size) {
-                val viewModel = sender[index!!]
-
-                if (viewModel != null)
-                    setShowDetailCommand(viewModel!!)
-            }
+        (positionStart until itemCount).forEach { index ->
+            if (index < sender.size) sender[index]?.let { setShowDetailCommand(it) }
         }
-        this.subscriptions.add(disposable)
     }
 
     override fun dispose() {
@@ -63,12 +58,9 @@ class ProductListAdapter(viewModels: ObservableArrayList<ProductListItemViewMode
                 .subscribe(this::itemClick) {}.addBug(this.subscriptions)
     }
 
-    class ViewHolder(view: View, owner: LifecycleOwner, val context: Context) : RecyclerView.ViewHolder(view) {
-        private val binding: ItemProductListBinding = DataBindingUtil.bind(view)!!
-
-        init {
-            this.binding.lifecycleOwner = owner
-        }
+    class ViewHolder(view: View, owner: LifecycleOwner) : RecyclerView.ViewHolder(view) {
+        private val binding: ItemProductListBinding =
+                DataBindingUtil.bind<ItemProductListBinding>(view)!!.owner(owner)
 
         fun update(viewModel: ProductListItemViewModel) {
             this.binding.viewModel = viewModel
@@ -79,7 +71,6 @@ class ProductListAdapter(viewModels: ObservableArrayList<ProductListItemViewMode
             try {
                 if (!TextUtils.isEmpty(viewModel.imageUrl.value)) {
                     this.binding.image.resizeFromDimen(
-                            this.context,
                             viewModel.imageUrl.value,
                             R.dimen.product_image_width,
                             R.dimen.product_image_height)
@@ -90,7 +81,6 @@ class ProductListAdapter(viewModels: ObservableArrayList<ProductListItemViewMode
             } catch (e: Exception) {
                 this.binding.image.visibility = View.INVISIBLE
             }
-
         }
     }
 }

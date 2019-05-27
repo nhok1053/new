@@ -1,7 +1,6 @@
 package jp.co.pise.studyapp.presentation.view.adapter
 
 import android.arch.lifecycle.LifecycleOwner
-import android.content.Context
 import android.databinding.DataBindingUtil
 import android.databinding.ObservableArrayList
 import android.databinding.ObservableList
@@ -17,14 +16,15 @@ import jp.co.pise.studyapp.domain.model.GetCouponItemModel
 import jp.co.pise.studyapp.extension.addBug
 import jp.co.pise.studyapp.presentation.viewmodel.adapter.CouponListItemViewModel
 import jp.co.pise.studyapp.databinding.ItemCouponListBinding
+import jp.co.pise.studyapp.extension.owner
 import jp.co.pise.studyapp.extension.resizeFromDimen
 
-class CouponListAdapter(viewModels: ObservableArrayList<CouponListItemViewModel>, owner: LifecycleOwner, context: Context) : BaseAdapter<CouponListItemViewModel, CouponListAdapter.ViewHolder>(viewModels, owner, context) {
+class CouponListAdapter(viewModels: ObservableArrayList<CouponListItemViewModel>, owner: LifecycleOwner) : BaseAdapter<CouponListItemViewModel, CouponListAdapter.ViewHolder>(viewModels, owner) {
     init { this.viewModels.forEach { setCommand(it) } }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.item_coupon_list, parent, false)
-        return ViewHolder(view, owner, this.context)
+        return ViewHolder(view, owner)
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
@@ -60,12 +60,11 @@ class CouponListAdapter(viewModels: ObservableArrayList<CouponListItemViewModel>
                 .subscribe(this::loginExpired) {}.addBug(this.subscriptions)
     }
 
-    class ViewHolder(view: View, owner: LifecycleOwner, val context: Context) : RecyclerView.ViewHolder(view) {
-        private val binding: ItemCouponListBinding = DataBindingUtil.bind(view)!!
+    class ViewHolder(view: View, owner: LifecycleOwner) : RecyclerView.ViewHolder(view) {
+        private val binding: ItemCouponListBinding =
+                DataBindingUtil.bind<ItemCouponListBinding>(view)!!.owner(owner)
 
         init {
-            this.binding.lifecycleOwner = owner
-
             this.binding.productPriceWithoutTax.paintFlags =
                     this.binding.productPriceWithoutTax.paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
             this.binding.productPriceInTax.paintFlags =
@@ -80,7 +79,7 @@ class CouponListAdapter(viewModels: ObservableArrayList<CouponListItemViewModel>
         private fun updateImage(viewModel: CouponListItemViewModel) {
             try {
                 if (!TextUtils.isEmpty(viewModel.imageUrl.value)) {
-                    this.binding.image.resizeFromDimen(this.context,
+                    this.binding.image.resizeFromDimen(
                             viewModel.imageUrl.value!!,
                             R.dimen.coupon_image_width,
                             R.dimen.coupon_image_height)

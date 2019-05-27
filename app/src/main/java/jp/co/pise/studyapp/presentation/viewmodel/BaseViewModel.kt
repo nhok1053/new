@@ -14,5 +14,5 @@ abstract class BaseViewModel : ViewModel(), Disposable {
         if (!subscriptions.isDisposed) subscriptions.dispose()
     }
 
-    override fun isDisposed(): Boolean = subscriptions.isDisposed
+    override fun isDisposed() = subscriptions.isDisposed
 }

@@ -14,9 +14,10 @@ import jp.co.pise.studyapp.framework.rx.LoginExpiredMessage
 import jp.co.pise.studyapp.presentation.StudyApp
 import jp.co.pise.studyapp.presentation.viewmodel.BaseViewModel
 
-abstract class BaseAdapter<VM : BaseViewModel, VH : RecyclerView.ViewHolder>(val viewModels: ObservableArrayList<VM>, val owner: LifecycleOwner, val context: Context) : RecyclerView.Adapter<VH>(), Disposable {
+abstract class BaseAdapter<VM : BaseViewModel, VH : RecyclerView.ViewHolder>(val viewModels: ObservableArrayList<VM>, val owner: LifecycleOwner) : RecyclerView.Adapter<VH>(), Disposable {
     private val onItemClickSubject: Subject<VM> = PublishSubject.create()
     protected val subscriptions = CompositeDisposable()
+    val onItemClick: Observable<VM> = this.onItemClickSubject
 
     private val onListChangedCallback = object : ObservableList.OnListChangedCallback<ObservableList<VM>>() {
         override fun onChanged(sender: ObservableList<VM>) {
@@ -47,10 +48,6 @@ abstract class BaseAdapter<VM : BaseViewModel, VH : RecyclerView.ViewHolder>(val
 
     init {
         this.viewModels.addOnListChangedCallback(onListChangedCallback)
-    }
-
-    fun onItemClick(): Observable<VM> {
-        return this.onItemClickSubject
     }
 
     protected fun loginExpired(message: LoginExpiredMessage) = StudyApp.instance.sendLoginExpired()

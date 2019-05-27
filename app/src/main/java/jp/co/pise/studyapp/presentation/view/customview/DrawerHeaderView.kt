@@ -12,6 +12,7 @@ import android.widget.FrameLayout
 import jp.co.pise.studyapp.R
 import jp.co.pise.studyapp.databinding.DrawerHeaderBinding
 import jp.co.pise.studyapp.domain.model.LoginUser
+import jp.co.pise.studyapp.extension.owner
 import jp.co.pise.studyapp.extension.resizeFromDimen
 import jp.co.pise.studyapp.presentation.StudyApp
 import jp.co.pise.studyapp.presentation.viewmodel.customview.DrawerHeaderViewModel
@@ -26,8 +27,9 @@ class DrawerHeaderView(context: Context, owner: LifecycleOwner) : FrameLayout(co
     init {
         StudyApp.instance.appComponent.inject(this)
 
-        this.binding = DataBindingUtil.inflate(LayoutInflater.from(context), R.layout.drawer_header, this, true)
-        this.binding.lifecycleOwner = owner
+        this.binding = DataBindingUtil
+                .inflate<DrawerHeaderBinding>(LayoutInflater.from(context), R.layout.drawer_header, this, true)
+                .owner(owner)
         this.binding.viewModel = this.viewModel
 
         this.viewModel.imageUrl.observe(owner, Observer { updateImage(it) })
@@ -41,7 +43,6 @@ class DrawerHeaderView(context: Context, owner: LifecycleOwner) : FrameLayout(co
         try {
             if (!TextUtils.isEmpty(this.viewModel.imageUrl.value)) {
                 this.binding.image.resizeFromDimen(
-                        this.context,
                         imageUrl,
                         R.dimen.drawer_header_image_width,
                         R.dimen.drawer_header_image_height)

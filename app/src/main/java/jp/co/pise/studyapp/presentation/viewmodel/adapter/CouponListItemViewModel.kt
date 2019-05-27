@@ -14,6 +14,7 @@ import jp.co.pise.studyapp.domain.model.LoginUser
 import jp.co.pise.studyapp.domain.model.UseCouponChallenge
 import jp.co.pise.studyapp.domain.usecase.CouponUse
 import jp.co.pise.studyapp.domain.usecase.UserLogin
+import jp.co.pise.studyapp.extension.addBug
 import jp.co.pise.studyapp.extension.default
 import jp.co.pise.studyapp.extension.map
 import jp.co.pise.studyapp.extension.unwrap
@@ -92,8 +93,7 @@ class CouponListItemViewModel @Inject constructor(userLogin: UserLogin, private 
     private val _description = MutableLiveData<String>()
     val description: LiveData<String> = this._description
 
-    private val _loginUser = MutableLiveData<LoginUser>()
-    val loginUser: LiveData<LoginUser> = this._loginUser
+    val loginUser = MutableLiveData<LoginUser>()
 
     private val onUseCouponComfirmSubject: Subject<CouponListItemViewModel> = PublishSubject.create()
     val onUseCouponComfirm: Observable<CouponListItemViewModel> = this.onUseCouponComfirmSubject
@@ -126,23 +126,23 @@ class CouponListItemViewModel @Inject constructor(userLogin: UserLogin, private 
     // region <----- factory ----->
 
     companion object {
-        fun fromResultItem(model: GetCouponItemModel, isLogin: Boolean, loginUser: LoginUser): CouponListItemViewModel {
+        fun fromResultItem(model: GetCouponItemModel, isLogin: Boolean, loginUser: LoginUser?): CouponListItemViewModel {
             val viewModel = StudyApp.instance.appComponent.createCouponListItemViewModel()
             viewModel._id = model.id
-            viewModel._name.value = model.name
-            viewModel._imageUrl.value = model.imageUrl
-            viewModel._description.value = model.description
-            viewModel._priceWithoutTax.value = model.priceWithoutTax
-            viewModel._priceInTax.value = model.priceInTax
-            viewModel._productPriceWithoutTax.value = model.productPriceWithoutTax
-            viewModel._productPriceInTax.value = model.productPriceInTax
-            viewModel._startDate.value = model.startDate
-            viewModel._endDate.value = model.endDate
-            viewModel._usedLimit.value = model.usedLimit
-            viewModel._usedCount.value = model.usedCount
+            viewModel._name.postValue(model.name)
+            viewModel._imageUrl.postValue(model.imageUrl)
+            viewModel._description.postValue(model.description)
+            viewModel._priceWithoutTax.postValue(model.priceWithoutTax)
+            viewModel._priceInTax.postValue(model.priceInTax)
+            viewModel._productPriceWithoutTax.postValue(model.productPriceWithoutTax)
+            viewModel._productPriceInTax.postValue(model.productPriceInTax)
+            viewModel._startDate.postValue(model.startDate)
+            viewModel._endDate.postValue(model.endDate)
+            viewModel._usedLimit.postValue(model.usedLimit)
+            viewModel._usedCount.postValue(model.usedCount)
             viewModel._sortOrder = model.sortOrder
-            viewModel._isLogin.value = isLogin
-            viewModel._loginUser.value = loginUser
+            viewModel._isLogin.postValue(isLogin)
+            viewModel.loginUser.postValue(loginUser)
             return viewModel
         }
     }
@@ -197,14 +197,13 @@ class CouponListItemViewModel @Inject constructor(userLogin: UserLogin, private 
 
     fun useCoupon() {
         if (this.isLogin.value.unwrap) {
-            if (this._loginUser.value != null) {
+            if (this.loginUser.value != null) {
                 this._isLoading.postValue(true)
-                val model = UseCouponChallenge(this._id, this._loginUser.value!!)
-                val disposable = this.couponUse.useCoupon(model).observeOn(AndroidSchedulers.mainThread()).subscribe({ result ->
+                val model = UseCouponChallenge(this._id, this.loginUser.value!!)
+                this.couponUse.useCoupon(model).observeOn(AndroidSchedulers.mainThread()).subscribe({ result ->
                     this._usedCount.postValue(result.usedCount)
                     this._isLoading.postValue(false)
-                }, { t -> checkLoginExpired(t) { this._isLoading.postValue(false) } })
-                this.subscriptions.add(disposable)
+                }, { t -> checkLoginExpired(t) { this._isLoading.postValue(false) } }).addBug(this.subscriptions)
             } else {
                 sendUserNotLoggedInMessage()
             }
