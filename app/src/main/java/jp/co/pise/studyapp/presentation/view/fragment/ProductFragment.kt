@@ -1,0 +1,110 @@
+package jp.co.pise.studyapp.presentation.view.fragment
+
+import android.arch.lifecycle.Observer
+import android.content.Context
+import android.databinding.DataBindingUtil
+import android.os.Bundle
+import android.support.v7.widget.GridLayoutManager
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import dagger.android.support.AndroidSupportInjection
+import io.reactivex.android.schedulers.AndroidSchedulers
+import jp.co.pise.studyapp.R
+import jp.co.pise.studyapp.databinding.FragmentProductBinding
+import jp.co.pise.studyapp.domain.model.ProductItemModel
+import jp.co.pise.studyapp.extension.addBug
+import jp.co.pise.studyapp.extension.unwrap
+import jp.co.pise.studyapp.presentation.view.adapter.ProductListAdapter
+import jp.co.pise.studyapp.presentation.viewmodel.fragment.ProductFragmentViewModel
+import javax.inject.Inject
+
+private const val SPAN_COUNT = 2
+
+class ProductFragment : BaseFragment() {
+    @Inject
+    lateinit var viewModel: ProductFragmentViewModel
+    private lateinit var binding: FragmentProductBinding
+    private lateinit var adapter: ProductListAdapter
+    private var isCreated = false
+    private var showProductDetailListener: ShowProductDetailListener? = null
+
+    interface ShowProductDetailListener {
+        fun onShowProductDetail(model: ProductItemModel)
+    }
+
+    companion object {
+        const val TAG = "ProductFragment"
+
+        fun newInstance(): ProductFragment {
+            return ProductFragment()
+        }
+    }
+
+    override fun onAttach(context: Context?) {
+        if (!this.isCreated) AndroidSupportInjection.inject(this)
+        super.onAttach(context)
+
+        if (context is ShowProductDetailListener) {
+            this.showProductDetailListener = context
+        } else {
+            this.showProductDetailListener = null
+        }
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+    }
+
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
+                              savedInstanceState: Bundle?): View? {
+
+        if (!this.isCreated) {
+            this.binding = DataBindingUtil.inflate(inflater, R.layout.fragment_product, container, false)
+            this.binding.viewModel = this.viewModel
+            this.viewModel.addBug(this.subscriptions)
+
+            this.binding.swipeRefresh.setOnRefreshListener { this.viewModel.refresh() }
+            this.viewModel.isRefreshing.observe(this, Observer {
+                if (!it.unwrap && binding.swipeRefresh.isRefreshing) {
+                    binding.swipeRefresh.isRefreshing = false
+                }
+            })
+
+            this.adapter = ProductListAdapter(this.viewModel.productList, this)
+            this.binding.recyclerView.layoutManager = GridLayoutManager(context, SPAN_COUNT)
+            this.binding.recyclerView.adapter = this.adapter
+            this.adapter.onItemClick.observeOn(AndroidSchedulers.mainThread())
+                    .subscribe({ itemViewModel -> showProductDetail(itemViewModel.toItemModel()) }, { }).addBug(this.subscriptions)
+            this.adapter.addBug(this.subscriptions)
+
+            this.viewModel.onLoginExpired.observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(this::loginExpired) { }.addBug(this.subscriptions)
+
+            this.viewModel.initialize()
+        }
+
+        if (!this.viewModel.isRefreshing.value.unwrap)
+            this.binding.swipeRefresh.isRefreshing = false
+
+        this.isCreated = true
+
+        return this.binding.root
+    }
+
+    private fun showProductDetail(model: ProductItemModel) {
+        this.showProductDetailListener?.onShowProductDetail(model)
+    }
+
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+        super.onActivityCreated(savedInstanceState)
+    }
+
+    override fun onResume() {
+        super.onResume()
+    }
+
+    override fun onPause() {
+        super.onPause()
+    }
+}

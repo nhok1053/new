@@ -77,7 +77,7 @@ class CouponFragmentViewModel @Inject constructor(userLogin: UserLogin, private 
                 it.sortOrder
             }?.map {
                 CouponListItemViewModel.fromResultItem(it, _isLogin.value.unwrap, _loginUser.value)
-            }?.toList()?.also {
+            }?.toList()?.let {
                 couponList.addAll(it)
             }
             action?.invoke()

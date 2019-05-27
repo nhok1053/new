@@ -8,7 +8,7 @@ import jp.co.pise.studyapp.framework.rx.LoginExpiredMessage
 import jp.co.pise.studyapp.presentation.StudyApp
 import jp.co.pise.studyapp.presentation.lifecycle.DisposableObserver
 
-class BaseDialogFragment : DialogFragment(), Disposable {
+abstract class BaseDialogFragment : DialogFragment(), Disposable {
     private val disableObserver = DisposableObserver()
     protected val subscriptions get() = this.disableObserver.subscriptions
 

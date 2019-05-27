@@ -37,7 +37,7 @@ class CouponListAdapter(viewModels: ObservableArrayList<CouponListItemViewModel>
 
     override fun onListItemRangeInserted(sender: ObservableList<CouponListItemViewModel>, positionStart: Int, itemCount: Int) {
         super.onListItemRangeInserted(sender, positionStart, itemCount)
-        (positionStart until itemCount).forEach { index -> sender[index]?.also { vm -> this.setCommand(vm) } }
+        (positionStart until itemCount).forEach { index -> sender[index]?.let { vm -> this.setCommand(vm) } }
     }
 
     override fun dispose() {
@@ -54,7 +54,7 @@ class CouponListAdapter(viewModels: ObservableArrayList<CouponListItemViewModel>
     }
 
     private fun setCommand(viewModel: CouponListItemViewModel) {
-        viewModel.onUseCouponComfirm.observeOn(AndroidSchedulers.mainThread())
+        viewModel.onUseCouponConfirm.observeOn(AndroidSchedulers.mainThread())
                 .subscribe(this::itemClick) {}.addBug(this.subscriptions)
         viewModel.onLoginExpired.observeOn(AndroidSchedulers.mainThread())
                 .subscribe(this::loginExpired) {}.addBug(this.subscriptions)

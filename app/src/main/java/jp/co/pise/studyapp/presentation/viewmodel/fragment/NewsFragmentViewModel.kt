@@ -58,7 +58,7 @@ class NewsFragmentViewModel @Inject constructor(userLogin: UserLogin, private va
                 it.sortOrder
             }?.map {
                 NewsListItemViewModel.fromResultItem(it)
-            }?.toList()?.also {
+            }?.toList()?.let {
                 newsList.addAll(it)
             }
             action?.invoke()

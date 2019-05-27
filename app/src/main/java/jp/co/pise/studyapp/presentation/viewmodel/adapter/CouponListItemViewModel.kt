@@ -95,10 +95,10 @@ class CouponListItemViewModel @Inject constructor(userLogin: UserLogin, private 
 
     val loginUser = MutableLiveData<LoginUser>()
 
-    private val onUseCouponComfirmSubject: Subject<CouponListItemViewModel> = PublishSubject.create()
-    val onUseCouponComfirm: Observable<CouponListItemViewModel> = this.onUseCouponComfirmSubject
+    private val onUseCouponConfirmSubject: Subject<CouponListItemViewModel> = PublishSubject.create()
+    val onUseCouponConfirm: Observable<CouponListItemViewModel> = this.onUseCouponConfirmSubject
 
-    val useCouponTitle = this.isLogin.map {
+    val useCouponTitle: LiveData<String> = this.isLogin.map {
         if (it) USE_COUPON_LOGIN_TITLE
         else USE_COUPON_NO_LOGIN_TITLE
     }
@@ -192,7 +192,7 @@ class CouponListItemViewModel @Inject constructor(userLogin: UserLogin, private 
     // region <----- action ----->
 
     fun useCouponConfirm() {
-        this.onUseCouponComfirmSubject.onNext(this)
+        this.onUseCouponConfirmSubject.onNext(this)
     }
 
     fun useCoupon() {
