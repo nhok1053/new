@@ -28,7 +28,6 @@ class ProductFragment : BaseFragment() {
     lateinit var viewModel: ProductFragmentViewModel
     private lateinit var binding: FragmentProductBinding
     private lateinit var adapter: ProductListAdapter
-    private var isCreated = false
     private var showProductDetailListener: ShowProductDetailListener? = null
 
     interface ShowProductDetailListener {
@@ -44,7 +43,7 @@ class ProductFragment : BaseFragment() {
     }
 
     override fun onAttach(context: Context?) {
-        if (!this.isCreated) AndroidSupportInjection.inject(this)
+        AndroidSupportInjection.inject(this)
         super.onAttach(context)
 
         if (context is ShowProductDetailListener) {
@@ -61,37 +60,33 @@ class ProductFragment : BaseFragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
 
-        if (!this.isCreated) {
-            this.binding = DataBindingUtil
-                    .inflate<FragmentProductBinding>(inflater, R.layout.fragment_product, container, false)
-                    .owner(this)
-            this.binding.viewModel = this.viewModel
-            this.viewModel.addBug(this.subscriptions)
+        this.binding = DataBindingUtil
+                .inflate<FragmentProductBinding>(inflater, R.layout.fragment_product, container, false)
+                .owner(this)
+        this.binding.viewModel = this.viewModel
+        this.viewModel.addBug(this.subscriptions)
 
-            this.binding.swipeRefresh.setOnRefreshListener { this.viewModel.refresh() }
+        this.binding.swipeRefresh.setOnRefreshListener { this.viewModel.refresh() }
 
-            this.adapter = ProductListAdapter(this.viewModel.productList, this)
-            this.binding.recyclerView.layoutManager = GridLayoutManager(context, SPAN_COUNT)
-            this.binding.recyclerView.adapter = this.adapter
-            this.adapter.onItemClick.observeOn(AndroidSchedulers.mainThread())
-                    .subscribe({ itemViewModel -> showProductDetail(itemViewModel.toItemModel()) }, { }).addBug(this.subscriptions)
-            this.adapter.addBug(this.subscriptions)
+        this.adapter = ProductListAdapter(this.viewModel.productList, this)
+        this.binding.recyclerView.layoutManager = GridLayoutManager(context, SPAN_COUNT)
+        this.binding.recyclerView.adapter = this.adapter
+        this.adapter.onItemClick.observeOn(AndroidSchedulers.mainThread())
+                .subscribe({ itemViewModel -> showProductDetail(itemViewModel.toItemModel()) }, { }).addBug(this.subscriptions)
+        this.adapter.addBug(this.subscriptions)
 
-            this.viewModel.onLoginExpired.observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(this::loginExpired) { }.addBug(this.subscriptions)
-            this.viewModel.isRefreshing.replaceObserve(this, Observer {
-                if (!it.unwrap && binding.swipeRefresh.isRefreshing) {
-                    binding.swipeRefresh.isRefreshing = false
-                }
-            })
+        this.viewModel.onLoginExpired.observeOn(AndroidSchedulers.mainThread())
+                .subscribe(this::loginExpired) { }.addBug(this.subscriptions)
+        this.viewModel.isRefreshing.replaceObserve(this, Observer {
+            if (!it.unwrap && binding.swipeRefresh.isRefreshing) {
+                binding.swipeRefresh.isRefreshing = false
+            }
+        })
 
-            this.viewModel.initialize()
-        }
+        this.viewModel.initialize()
 
         if (!this.viewModel.isRefreshing.value.unwrap)
             this.binding.swipeRefresh.isRefreshing = false
-
-        this.isCreated = true
 
         return this.binding.root
     }

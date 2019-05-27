@@ -27,7 +27,6 @@ class CouponFragment : BaseFragment() {
     lateinit var viewModel: CouponFragmentViewModel
     private lateinit var binding: FragmentCouponBinding
     private lateinit var adapter: CouponListAdapter
-    private var isCreated = false
     private var useCouponConfirmListener: UseCouponConfirmListener? = null
 
     interface UseCouponConfirmListener {
@@ -47,7 +46,7 @@ class CouponFragment : BaseFragment() {
     }
 
     override fun onAttach(context: Context?) {
-        if (!this.isCreated) AndroidSupportInjection.inject(this)
+        AndroidSupportInjection.inject(this)
         super.onAttach(context)
 
         if (context is UseCouponConfirmListener) {
@@ -64,46 +63,43 @@ class CouponFragment : BaseFragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
 
-        if (!this.isCreated) {
-            this.binding = DataBindingUtil
-                    .inflate<FragmentCouponBinding>(inflater, R.layout.fragment_coupon, container, false)
-                    .owner(this)
-            this.binding.viewModel = this.viewModel
-            this.viewModel.addBug(this.subscriptions)
+        this.binding = DataBindingUtil
+                .inflate<FragmentCouponBinding>(inflater, R.layout.fragment_coupon, container, false)
+                .owner(this)
+        this.binding.viewModel = this.viewModel
+        this.viewModel.addBug(this.subscriptions)
 
-            // setting swipe refresh
-            this.binding.swipeRefresh.setOnRefreshListener { initViewModel() }
+        // setting swipe refresh
+        this.binding.swipeRefresh.setOnRefreshListener { initViewModel() }
 
-            // setting adapter
-            this.adapter = CouponListAdapter(this.viewModel.couponList, this)
-            this.binding.recyclerView.layoutManager = LinearLayoutManager(context)
-            this.binding.recyclerView.adapter = this.adapter
-            this.adapter.onItemClick.observeOn(AndroidSchedulers.mainThread())
-                    .subscribe({ itemViewModel -> useCouponConfirm(itemViewModel.toItemModel()) }, { }).addBug(this.subscriptions)
-            this.adapter.addBug(this.subscriptions)
+        // setting adapter
+        this.adapter = CouponListAdapter(this.viewModel.couponList, this)
+        this.binding.recyclerView.layoutManager = LinearLayoutManager(context)
+        this.binding.recyclerView.adapter = this.adapter
+        this.adapter.onItemClick.observeOn(AndroidSchedulers.mainThread())
+                .subscribe({ itemViewModel -> useCouponConfirm(itemViewModel.toItemModel()) }, { }).addBug(this.subscriptions)
+        this.adapter.addBug(this.subscriptions)
 
-            // setting view model
-            this.viewModel.onLoginExpired.observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(this::loginExpired) { }.addBug(this.subscriptions)
-            this.viewModel.isRefreshing.replaceObserve(this, Observer {
-                if (!it.unwrap && binding.swipeRefresh.isRefreshing) {
-                    binding.swipeRefresh.isRefreshing = false
-                }
-            })
+        // setting view model
+        this.viewModel.onLoginExpired.observeOn(AndroidSchedulers.mainThread())
+                .subscribe(this::loginExpired) { }.addBug(this.subscriptions)
+        this.viewModel.isRefreshing.replaceObserve(this, Observer {
+            if (!it.unwrap && binding.swipeRefresh.isRefreshing) {
+                binding.swipeRefresh.isRefreshing = false
+            }
+        })
 
-            // setting app message
-            StudyApp.instance.onLoginStateChange
-                    .subscribe({ initViewModel() }, { }).addBug(this.subscriptions)
-            StudyApp.instance.onRefreshedUsedCoupon
-                    .subscribe({ initViewModel() }, { }).addBug(this.subscriptions)
+        // setting app message
+        StudyApp.instance.onLoginStateChange
+                .subscribe({ initViewModel() }, { }).addBug(this.subscriptions)
+        StudyApp.instance.onRefreshedUsedCoupon
+                .subscribe({ initViewModel() }, { }).addBug(this.subscriptions)
 
-            initViewModel()
-        }
+        initViewModel()
 
         if (!this.viewModel.isRefreshing.value.unwrap)
             this.binding.swipeRefresh.isRefreshing = false
 
-        this.isCreated = true
         return this.binding.root
     }
 

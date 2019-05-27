@@ -26,8 +26,6 @@ class NewsFragment : BaseFragment() {
     private lateinit var binding: FragmentNewsBinding
     private lateinit var adapter: NewsListAdapter
 
-    private var isCreated = false
-
     companion object {
         const val TAG = "NewsFragment"
 
@@ -37,7 +35,7 @@ class NewsFragment : BaseFragment() {
     }
 
     override fun onAttach(context: Context?) {
-        if (!this.isCreated) AndroidSupportInjection.inject(this)
+        AndroidSupportInjection.inject(this)
         super.onAttach(context)
     }
 
@@ -48,35 +46,31 @@ class NewsFragment : BaseFragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
 
-        if (!this.isCreated) {
-            this.binding = DataBindingUtil
-                    .inflate<FragmentNewsBinding>(inflater, R.layout.fragment_news, container, false)
-                    .owner(this)
-            this.binding.viewModel = this.viewModel
-            this.viewModel.addBug(this.subscriptions)
+        this.binding = DataBindingUtil
+                .inflate<FragmentNewsBinding>(inflater, R.layout.fragment_news, container, false)
+                .owner(this)
+        this.binding.viewModel = this.viewModel
+        this.viewModel.addBug(this.subscriptions)
 
-            this.binding.swipeRefresh.setOnRefreshListener { this.viewModel.refresh() }
+        this.binding.swipeRefresh.setOnRefreshListener { this.viewModel.refresh() }
 
-            this.adapter = NewsListAdapter(this.viewModel.newsList, this)
-            this.binding.recyclerView.layoutManager = LinearLayoutManager(context)
-            this.binding.recyclerView.adapter = this.adapter
-            this.adapter.addBug(this.subscriptions)
+        this.adapter = NewsListAdapter(this.viewModel.newsList, this)
+        this.binding.recyclerView.layoutManager = LinearLayoutManager(context)
+        this.binding.recyclerView.adapter = this.adapter
+        this.adapter.addBug(this.subscriptions)
 
-            this.viewModel.onLoginExpired.observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(this::loginExpired) {}.addBug(this.subscriptions)
-            this.viewModel.isRefreshing.replaceObserve(this, Observer {
-                if (!it.unwrap && binding.swipeRefresh.isRefreshing) {
-                    binding.swipeRefresh.isRefreshing = false
-                }
-            })
+        this.viewModel.onLoginExpired.observeOn(AndroidSchedulers.mainThread())
+                .subscribe(this::loginExpired) {}.addBug(this.subscriptions)
+        this.viewModel.isRefreshing.replaceObserve(this, Observer {
+            if (!it.unwrap && binding.swipeRefresh.isRefreshing) {
+                binding.swipeRefresh.isRefreshing = false
+            }
+        })
 
-            this.viewModel.initialize()
-        }
+        this.viewModel.initialize()
 
         if (!this.viewModel.isRefreshing.value.unwrap)
             this.binding.swipeRefresh.isRefreshing = false
-
-        this.isCreated = true
 
         return this.binding.root
     }

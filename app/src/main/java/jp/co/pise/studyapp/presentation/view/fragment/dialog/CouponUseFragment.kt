@@ -128,13 +128,6 @@ class CouponUseFragment : BaseDialogFragment() {
         super.onPause()
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-
-        if (!this.isDisposed)
-            this.dispose()
-    }
-
     private fun setImage(imageUrl: String?) {
         try {
             if (!TextUtils.isEmpty(imageUrl)) {

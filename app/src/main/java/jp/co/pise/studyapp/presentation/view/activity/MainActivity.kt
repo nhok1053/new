@@ -136,18 +136,9 @@ class MainActivity : BaseActivity(),
         // BottomNavigation Setting
         this.binding.bottomNavigation.setOnNavigationItemSelectedListener { menuItem ->
             when (menuItem.itemId) {
-                R.id.nav_news -> {
-                    if (this.newsFragment == null) this.newsFragment = createNewsFragment()
-                    replaceContainer(this.newsFragment, NewsFragment.TAG, resources.getString(R.string.news_tab_title))
-                }
-                R.id.nav_coupon -> {
-                    if (this.couponFragment == null) this.couponFragment = createCouponFragment()
-                    replaceContainer(this.couponFragment, CouponFragment.TAG, resources.getString(R.string.coupon_tab_title))
-                }
-                R.id.nav_product -> {
-                    if (this.productFragment == null) this.productFragment = createProductFragment()
-                    replaceContainer(this.productFragment, ProductFragment.TAG, resources.getString(R.string.product_tab_title))
-                }
+                R.id.nav_news -> replaceNewsFragment()
+                R.id.nav_coupon -> replaceCouponFragment()
+                R.id.nav_product -> replaceProductFragment()
             }
             true
         }
@@ -194,6 +185,30 @@ class MainActivity : BaseActivity(),
         } else {
             this.binding.navigationView.inflateMenu(R.menu.not_signin_drawer_item)
         }
+    }
+
+    private fun replaceNewsFragment() {
+        this.newsFragment?.dispose()
+        this.newsFragment = null
+
+        this.newsFragment = createNewsFragment()
+        replaceContainer(this.newsFragment, NewsFragment.TAG, resources.getString(R.string.news_tab_title))
+    }
+
+    private fun replaceCouponFragment() {
+        this.couponFragment?.dispose()
+        this.couponFragment = null
+
+        this.couponFragment = createCouponFragment()
+        replaceContainer(this.couponFragment, CouponFragment.TAG, resources.getString(R.string.coupon_tab_title))
+    }
+
+    private fun replaceProductFragment() {
+        this.productFragment?.dispose()
+        this.productFragment = null
+
+        this.productFragment = createProductFragment()
+        replaceContainer(this.productFragment, ProductFragment.TAG, resources.getString(R.string.product_tab_title))
     }
 
     private fun createNewsFragment(): NewsFragment {
