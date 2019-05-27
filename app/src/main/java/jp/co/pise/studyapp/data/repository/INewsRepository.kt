@@ -5,7 +5,7 @@ import jp.co.pise.studyapp.domain.model.GetNewsResult
 import jp.co.pise.studyapp.domain.model.SaveNewsChallenge
 import jp.co.pise.studyapp.domain.model.SaveNewsResult
 
-interface INewsRepository {
+interface INewsRepository : IRepository {
     fun getNews(): Single<GetNewsResult>
     fun saveNews(model: SaveNewsChallenge): Single<SaveNewsResult>
 }

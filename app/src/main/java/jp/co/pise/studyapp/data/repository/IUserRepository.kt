@@ -5,7 +5,7 @@ import io.reactivex.annotations.NonNull
 import jp.co.pise.studyapp.data.entity.User
 import jp.co.pise.studyapp.domain.model.*
 
-interface IUserRepository {
+interface IUserRepository : IRepository {
     fun login(model: LoginChallenge): Single<LoginResult>
     fun logout(model: LogoutChallenge): Single<LogoutResult>
     fun getUser(model: GetUserParam): Single<GetUserResult>

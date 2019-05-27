@@ -1,12 +1,14 @@
 package jp.co.pise.studyapp.presentation.view.adapter
 
 import android.arch.lifecycle.LifecycleOwner
+import android.arch.lifecycle.Observer
 import android.content.Context
 import android.databinding.DataBindingUtil
 import android.databinding.ObservableArrayList
 import android.databinding.ObservableList
 import android.support.v7.widget.RecyclerView
 import android.text.TextUtils
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -16,6 +18,7 @@ import jp.co.pise.studyapp.R
 import jp.co.pise.studyapp.databinding.ItemProductListBinding
 import jp.co.pise.studyapp.extension.addBug
 import jp.co.pise.studyapp.extension.owner
+import jp.co.pise.studyapp.extension.replaceObserve
 import jp.co.pise.studyapp.extension.resizeFromDimen
 import jp.co.pise.studyapp.presentation.viewmodel.adapter.ProductListItemViewModel
 
@@ -58,20 +61,20 @@ class ProductListAdapter(viewModels: ObservableArrayList<ProductListItemViewMode
                 .subscribe(this::itemClick) {}.addBug(this.subscriptions)
     }
 
-    class ViewHolder(view: View, owner: LifecycleOwner) : RecyclerView.ViewHolder(view) {
-        private val binding: ItemProductListBinding =
-                DataBindingUtil.bind<ItemProductListBinding>(view)!!.owner(owner)
+    class ViewHolder(root: View, private val owner: LifecycleOwner) : RecyclerView.ViewHolder(root) {
+        val binding =
+                DataBindingUtil.bind<ItemProductListBinding>(root)!!.owner(this.owner)
 
         fun update(viewModel: ProductListItemViewModel) {
             this.binding.viewModel = viewModel
-            updateImage(viewModel)
+            viewModel.imageUrl.replaceObserve(this.owner, Observer { updateImage(it) })
         }
 
-        private fun updateImage(viewModel: ProductListItemViewModel) {
+        private fun updateImage(imageUrl: String?) {
             try {
-                if (!TextUtils.isEmpty(viewModel.imageUrl.value)) {
+                if (!TextUtils.isEmpty(imageUrl)) {
                     this.binding.image.resizeFromDimen(
-                            viewModel.imageUrl.value,
+                            imageUrl!!,
                             R.dimen.product_image_width,
                             R.dimen.product_image_height)
                     this.binding.image.visibility = View.VISIBLE

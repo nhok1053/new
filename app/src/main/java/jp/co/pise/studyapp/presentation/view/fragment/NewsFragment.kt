@@ -14,6 +14,7 @@ import jp.co.pise.studyapp.R
 import jp.co.pise.studyapp.databinding.FragmentNewsBinding
 import jp.co.pise.studyapp.extension.addBug
 import jp.co.pise.studyapp.extension.owner
+import jp.co.pise.studyapp.extension.replaceObserve
 import jp.co.pise.studyapp.extension.unwrap
 import jp.co.pise.studyapp.presentation.view.adapter.NewsListAdapter
 import jp.co.pise.studyapp.presentation.viewmodel.fragment.NewsFragmentViewModel
@@ -55,11 +56,6 @@ class NewsFragment : BaseFragment() {
             this.viewModel.addBug(this.subscriptions)
 
             this.binding.swipeRefresh.setOnRefreshListener { this.viewModel.refresh() }
-            this.viewModel.isRefreshing.observe(this, Observer {
-                if (!it.unwrap && binding.swipeRefresh.isRefreshing) {
-                    binding.swipeRefresh.isRefreshing = false
-                }
-            })
 
             this.adapter = NewsListAdapter(this.viewModel.newsList, this)
             this.binding.recyclerView.layoutManager = LinearLayoutManager(context)
@@ -68,6 +64,12 @@ class NewsFragment : BaseFragment() {
 
             this.viewModel.onLoginExpired.observeOn(AndroidSchedulers.mainThread())
                     .subscribe(this::loginExpired) {}.addBug(this.subscriptions)
+            this.viewModel.isRefreshing.replaceObserve(this, Observer {
+                if (!it.unwrap && binding.swipeRefresh.isRefreshing) {
+                    binding.swipeRefresh.isRefreshing = false
+                }
+            })
+
             this.viewModel.initialize()
         }
 

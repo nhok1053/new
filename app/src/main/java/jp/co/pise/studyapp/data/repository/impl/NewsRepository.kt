@@ -10,6 +10,7 @@ import jp.co.pise.studyapp.domain.model.GetNewsItemModel
 import jp.co.pise.studyapp.domain.model.GetNewsResult
 import jp.co.pise.studyapp.domain.model.SaveNewsChallenge
 import jp.co.pise.studyapp.domain.model.SaveNewsResult
+import jp.co.pise.studyapp.extension.addBug
 import jp.co.pise.studyapp.extension.onSafeError
 import jp.co.pise.studyapp.framework.retrofit.NewsApiInterface
 import java.util.ArrayList
@@ -20,14 +21,13 @@ class NewsRepository @Inject constructor(private val newsApi: NewsApiInterface, 
     override fun getNews(): Single<GetNewsResult> =
             Single.create<GetNewsResult> { emitter ->
                 try {
-                    val disposable = this.newsApi.getNews().subscribeOn(Schedulers.io()).subscribe({ response ->
+                    this.newsApi.getNews().subscribeOn(Schedulers.io()).subscribe({ response ->
                         if (response.validate()) {
                             emitter.onSuccess(response.body()!!.convert())
                         } else {
                             emitter.onSafeError(response)
                         }
-                    }, emitter::onSafeError)
-                    this.subscriptions.add(disposable)
+                    }, emitter::onSafeError).addBug(this.subscriptions)
                 } catch (e: Exception) {
                     emitter.onSafeError(e)
                 }

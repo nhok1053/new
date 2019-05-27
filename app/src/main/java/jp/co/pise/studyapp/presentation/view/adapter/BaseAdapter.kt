@@ -1,24 +1,24 @@
 package jp.co.pise.studyapp.presentation.view.adapter
 
 import android.arch.lifecycle.LifecycleOwner
-import android.content.Context
+import android.databinding.DataBindingUtil
 import android.databinding.ObservableArrayList
 import android.databinding.ObservableList
+import android.databinding.ViewDataBinding
 import android.support.v7.widget.RecyclerView
+import android.view.View
 import io.reactivex.Observable
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 import io.reactivex.subjects.PublishSubject
 import io.reactivex.subjects.Subject
+import jp.co.pise.studyapp.extension.owner
 import jp.co.pise.studyapp.framework.rx.LoginExpiredMessage
 import jp.co.pise.studyapp.presentation.StudyApp
 import jp.co.pise.studyapp.presentation.viewmodel.BaseViewModel
 
-abstract class BaseAdapter<VM : BaseViewModel, VH : RecyclerView.ViewHolder>(val viewModels: ObservableArrayList<VM>, val owner: LifecycleOwner) : RecyclerView.Adapter<VH>(), Disposable {
+abstract class BaseAdapter<VM : BaseViewModel, VH : RecyclerView.ViewHolder>(protected val viewModels: ObservableArrayList<VM>, protected val owner: LifecycleOwner) : RecyclerView.Adapter<VH>(), Disposable  {
     private val onItemClickSubject: Subject<VM> = PublishSubject.create()
-    protected val subscriptions = CompositeDisposable()
-    val onItemClick: Observable<VM> = this.onItemClickSubject
-
     private val onListChangedCallback = object : ObservableList.OnListChangedCallback<ObservableList<VM>>() {
         override fun onChanged(sender: ObservableList<VM>) {
             onListItemChange(sender)
@@ -46,8 +46,13 @@ abstract class BaseAdapter<VM : BaseViewModel, VH : RecyclerView.ViewHolder>(val
         }
     }
 
+    protected val subscriptions = CompositeDisposable()
+    protected val viewHolders: MutableList<VH> = mutableListOf()
+
+    val onItemClick: Observable<VM> = this.onItemClickSubject
+
     init {
-        this.viewModels.addOnListChangedCallback(onListChangedCallback)
+        this.viewModels.addOnListChangedCallback(this.onListChangedCallback)
     }
 
     protected fun loginExpired(message: LoginExpiredMessage) = StudyApp.instance.sendLoginExpired()

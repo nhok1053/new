@@ -6,7 +6,7 @@ import jp.co.pise.studyapp.domain.model.GetProductResult
 import jp.co.pise.studyapp.domain.model.SaveProductChallenge
 import jp.co.pise.studyapp.domain.model.SaveProductResult
 
-interface IProductRepository {
+interface IProductRepository : IRepository {
     fun getProduct(model: GetProductChallenge): Single<GetProductResult>
     fun saveProduct(model: SaveProductChallenge): Single<SaveProductResult>
 }

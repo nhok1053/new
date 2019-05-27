@@ -12,7 +12,10 @@ import jp.co.pise.studyapp.extension.onSafeError
 import java.util.ArrayList
 import javax.inject.Inject
 
-class NewsDisplay @Inject constructor(private val newsRepository: INewsRepository):Usecase() {
+class NewsDisplay @Inject constructor(private val newsRepository: INewsRepository) : Usecase() {
+    init {
+        this.newsRepository.addBug(this.subscriptions)
+    }
 
     fun getNews(): Single<GetNewsResult> =
             this.newsRepository.getNews().flatMap<GetNewsResult> { getNewsResult ->

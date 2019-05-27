@@ -31,8 +31,9 @@ class LoginActivity : BaseActivity() {
         this.binding.viewModel = viewModel
         this.viewModel.addBug(this.subscriptions)
 
-        val toolbar = this.binding.toolbar as Toolbar
-        setSupportActionBar(toolbar)
+        (this.binding.toolbar as Toolbar?)?.let {
+            setSupportActionBar(it)
+        }
 
         this.binding.content.setOnClickListener {
             val currentFocus = currentFocus

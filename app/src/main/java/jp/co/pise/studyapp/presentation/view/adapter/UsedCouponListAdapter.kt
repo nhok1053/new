@@ -1,7 +1,6 @@
 package jp.co.pise.studyapp.presentation.view.adapter
 
 import android.arch.lifecycle.LifecycleOwner
-import android.content.Context
 import android.databinding.DataBindingUtil
 import android.databinding.ObservableArrayList
 import android.support.v7.widget.RecyclerView
@@ -37,9 +36,9 @@ class UsedCouponListAdapter(viewModels: ObservableArrayList<UsedCouponListItemVi
         return this.subscriptions.isDisposed
     }
 
-    class ViewHolder(view: View, owner: LifecycleOwner) : RecyclerView.ViewHolder(view) {
-        private val binding: ItemUsedCouponListBinding =
-                DataBindingUtil.bind<ItemUsedCouponListBinding>(view)!!.owner(owner)
+    class ViewHolder(root: View, private val owner: LifecycleOwner) : RecyclerView.ViewHolder(root) {
+        val binding =
+                DataBindingUtil.bind<ItemUsedCouponListBinding>(root)!!.owner(this.owner)
 
         fun update(viewModel: UsedCouponListItemViewModel) {
             this.binding.viewModel = viewModel

@@ -1,6 +1,7 @@
 package jp.co.pise.studyapp.presentation.view.fragment.dialog
 
 import android.app.Dialog
+import android.arch.lifecycle.Observer
 import android.content.Context
 import android.databinding.DataBindingUtil
 import android.graphics.Color
@@ -16,6 +17,7 @@ import jp.co.pise.studyapp.databinding.FragmentProductDetailBinding
 import jp.co.pise.studyapp.domain.model.ProductItemModel
 import jp.co.pise.studyapp.extension.addBug
 import jp.co.pise.studyapp.extension.owner
+import jp.co.pise.studyapp.extension.replaceObserve
 import jp.co.pise.studyapp.extension.resizeFromDimen
 import jp.co.pise.studyapp.presentation.viewmodel.fragment.dialog.ProductDetailFragmentViewModel
 
@@ -44,10 +46,21 @@ class ProductDetailFragment : BaseDialogFragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         if (arguments != null && arguments!!.getSerializable(PRODUCT) is ProductItemModel) {
-            val product = arguments!!.getSerializable(PRODUCT) as ProductItemModel
-            this.viewModel = ProductDetailFragmentViewModel.fromResultItem(product)
-            this.viewModel!!.onClose.observeOn(AndroidSchedulers.mainThread())
-                    .subscribe({ dismiss() }, { }).addBug(this.subscriptions)
+            val product = arguments!!.getSerializable(PRODUCT) as ProductItemModel?
+            if (product != null) {
+                this.viewModel = ProductDetailFragmentViewModel.fromResultItem(product)
+                this.viewModel?.let {
+                    it.imageUrl.replaceObserve(this, Observer { imageUrl -> this.setImage(imageUrl) })
+                    it.onClose.observeOn(AndroidSchedulers.mainThread())
+                            .subscribe({ dismiss() }, { }).addBug(this.subscriptions)
+                }
+            } else {
+                this.viewModel?.dispose()
+                this.viewModel = null
+            }
+        } else {
+            this.viewModel?.dispose()
+            this.viewModel = null
         }
     }
 
@@ -61,7 +74,6 @@ class ProductDetailFragment : BaseDialogFragment() {
         this.viewModel?.let {
             this.binding.viewModel = this.viewModel
             it.addBug(this.subscriptions)
-            setImage()
         }
 
         return this.binding.root
@@ -92,11 +104,11 @@ class ProductDetailFragment : BaseDialogFragment() {
             this.dispose()
     }
 
-    private fun setImage() {
+    private fun setImage(imageUrl: String?) {
         try {
-            if (!TextUtils.isEmpty(viewModel?.imageUrl?.value)) {
+            if (!TextUtils.isEmpty(imageUrl)) {
                 this.binding.image.resizeFromDimen(
-                        viewModel!!.imageUrl.value,
+                        imageUrl!!,
                         R.dimen.product_detail_image_width,
                         R.dimen.product_detail_image_height)
                 this.binding.image.visibility = View.VISIBLE
@@ -106,6 +118,5 @@ class ProductDetailFragment : BaseDialogFragment() {
         } catch (e: Exception) {
             this.binding.image.visibility = View.INVISIBLE
         }
-
     }
 }

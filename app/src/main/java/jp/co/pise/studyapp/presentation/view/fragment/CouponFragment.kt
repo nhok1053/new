@@ -15,6 +15,7 @@ import jp.co.pise.studyapp.databinding.FragmentCouponBinding
 import jp.co.pise.studyapp.domain.model.GetCouponItemModel
 import jp.co.pise.studyapp.extension.addBug
 import jp.co.pise.studyapp.extension.owner
+import jp.co.pise.studyapp.extension.replaceObserve
 import jp.co.pise.studyapp.extension.unwrap
 import jp.co.pise.studyapp.presentation.StudyApp
 import jp.co.pise.studyapp.presentation.view.adapter.CouponListAdapter
@@ -71,12 +72,7 @@ class CouponFragment : BaseFragment() {
             this.viewModel.addBug(this.subscriptions)
 
             // setting swipe refresh
-            this.binding.swipeRefresh.setOnRefreshListener { this.viewModel.refresh() }
-            this.viewModel.isRefreshing.observe(this, Observer {
-                if (!it.unwrap && binding.swipeRefresh.isRefreshing) {
-                    binding.swipeRefresh.isRefreshing = false
-                }
-            })
+            this.binding.swipeRefresh.setOnRefreshListener { initViewModel() }
 
             // setting adapter
             this.adapter = CouponListAdapter(this.viewModel.couponList, this)
@@ -89,12 +85,17 @@ class CouponFragment : BaseFragment() {
             // setting view model
             this.viewModel.onLoginExpired.observeOn(AndroidSchedulers.mainThread())
                     .subscribe(this::loginExpired) { }.addBug(this.subscriptions)
+            this.viewModel.isRefreshing.replaceObserve(this, Observer {
+                if (!it.unwrap && binding.swipeRefresh.isRefreshing) {
+                    binding.swipeRefresh.isRefreshing = false
+                }
+            })
 
             // setting app message
             StudyApp.instance.onLoginStateChange
                     .subscribe({ initViewModel() }, { }).addBug(this.subscriptions)
             StudyApp.instance.onRefreshedUsedCoupon
-                    .subscribe({ this.viewModel.refresh() }, { }).addBug(this.subscriptions)
+                    .subscribe({ initViewModel() }, { }).addBug(this.subscriptions)
 
             initViewModel()
         }
@@ -103,7 +104,6 @@ class CouponFragment : BaseFragment() {
             this.binding.swipeRefresh.isRefreshing = false
 
         this.isCreated = true
-
         return this.binding.root
     }
 

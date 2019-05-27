@@ -3,6 +3,7 @@ package jp.co.pise.studyapp.presentation.viewmodel.fragment
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MutableLiveData
 import android.databinding.ObservableArrayList
+import android.os.Handler
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import jp.co.pise.studyapp.domain.model.GetCouponChallenge
@@ -22,12 +23,6 @@ class CouponFragmentViewModel @Inject constructor(userLogin: UserLogin, private 
 
     // region <----- data ----->
 
-    private val _isLogin = MutableLiveData<Boolean>().default(false)
-    val isLogin: LiveData<Boolean> = this._isLogin
-
-    private val _loginUser = MutableLiveData<LoginUser?>()
-    val loginUser: LiveData<LoginUser?> = this._loginUser
-
     private val _isLoading = MutableLiveData<Boolean>()
     val isLoading: LiveData<Boolean> = this._isLoading
 
@@ -36,33 +31,22 @@ class CouponFragmentViewModel @Inject constructor(userLogin: UserLogin, private 
 
     val couponList = ObservableArrayList<CouponListItemViewModel>()
 
+    val name = MutableLiveData<String>()
+
     // endregion
 
     // region <----- function ----->
 
     fun initialize(isLogin: Boolean, loginUser: LoginUser?) {
-        this._isLogin.postValue(isLogin)
-        this._loginUser.postValue(loginUser)
-
-        this._isLoading.postValue(true)
-        getCoupon { this._isLoading.postValue(false) }
-    }
-
-    fun setLoginUser(loginUser: LoginUser?) {
-        this._loginUser.postValue(loginUser)
-        this.couponList.forEach { it.loginUser.postValue(loginUser) }
-    }
-
-    fun refresh() {
         this._isLoading.postValue(true)
         this._isRefreshing.postValue(true)
-        getCoupon {
+        getCoupon(isLogin, loginUser) {
             this._isLoading.postValue(false)
             this._isRefreshing.postValue(false)
         }
     }
 
-    private fun getCoupon(action: (() -> Unit)?) {
+    private fun getCoupon(isLogin: Boolean, loginUser: LoginUser?, action: (() -> Unit)?) {
         if (this.getCouponDisposable != null) {
             if (!this.getCouponDisposable!!.isDisposed)
                 this.getCouponDisposable?.dispose()
@@ -71,12 +55,12 @@ class CouponFragmentViewModel @Inject constructor(userLogin: UserLogin, private 
         }
 
         this.couponList.clear()
-        val model = GetCouponChallenge(this._isLogin.value.unwrap, this._loginUser.value)
+        val model = GetCouponChallenge(isLogin, loginUser)
         this.getCouponDisposable = this.couponDisplay.getCoupon(model).observeOn(AndroidSchedulers.mainThread()).subscribe({ result ->
             result.coupons?.sortedBy {
                 it.sortOrder
             }?.map {
-                CouponListItemViewModel.fromResultItem(it, _isLogin.value.unwrap, _loginUser.value)
+                CouponListItemViewModel.fromResultItem(it, isLogin, loginUser)
             }?.toList()?.let {
                 couponList.addAll(it)
             }

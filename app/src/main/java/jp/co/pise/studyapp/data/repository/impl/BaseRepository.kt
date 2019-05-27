@@ -14,7 +14,7 @@ import retrofit2.Response
 import java.net.HttpURLConnection
 
 abstract class BaseRepository : IRepository {
-    protected var subscriptions = CompositeDisposable()
+    protected val subscriptions = CompositeDisposable()
 
     fun <T : ApiResultModel> Response<T>.validate(): Boolean {
         val body = this.body()
@@ -113,7 +113,7 @@ abstract class ApiResultModel {
     var errorMessage: String? = null
         protected set
 
-    val apiResultCode = ApiResultCode.findByValue(resultCode)
+    val apiResultCode get() = ApiResultCode.findByValue(resultCode)
 }
 
 open class ProductItemApiModel {

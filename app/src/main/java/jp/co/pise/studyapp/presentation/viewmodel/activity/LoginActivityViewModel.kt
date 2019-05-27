@@ -17,6 +17,10 @@ import jp.co.pise.studyapp.presentation.viewmodel.BaseViewModel
 import javax.inject.Inject
 
 class LoginActivityViewModel @Inject constructor(private val userLogin: UserLogin) : BaseViewModel() {
+    init {
+        this.userLogin.addBug(this.subscriptions)
+    }
+
     val loginId = MutableLiveData<String>()
     val password = MutableLiveData<String>()
 

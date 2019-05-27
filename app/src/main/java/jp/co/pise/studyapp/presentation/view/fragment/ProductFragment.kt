@@ -14,6 +14,8 @@ import jp.co.pise.studyapp.R
 import jp.co.pise.studyapp.databinding.FragmentProductBinding
 import jp.co.pise.studyapp.domain.model.ProductItemModel
 import jp.co.pise.studyapp.extension.addBug
+import jp.co.pise.studyapp.extension.owner
+import jp.co.pise.studyapp.extension.replaceObserve
 import jp.co.pise.studyapp.extension.unwrap
 import jp.co.pise.studyapp.presentation.view.adapter.ProductListAdapter
 import jp.co.pise.studyapp.presentation.viewmodel.fragment.ProductFragmentViewModel
@@ -60,16 +62,13 @@ class ProductFragment : BaseFragment() {
                               savedInstanceState: Bundle?): View? {
 
         if (!this.isCreated) {
-            this.binding = DataBindingUtil.inflate(inflater, R.layout.fragment_product, container, false)
+            this.binding = DataBindingUtil
+                    .inflate<FragmentProductBinding>(inflater, R.layout.fragment_product, container, false)
+                    .owner(this)
             this.binding.viewModel = this.viewModel
             this.viewModel.addBug(this.subscriptions)
 
             this.binding.swipeRefresh.setOnRefreshListener { this.viewModel.refresh() }
-            this.viewModel.isRefreshing.observe(this, Observer {
-                if (!it.unwrap && binding.swipeRefresh.isRefreshing) {
-                    binding.swipeRefresh.isRefreshing = false
-                }
-            })
 
             this.adapter = ProductListAdapter(this.viewModel.productList, this)
             this.binding.recyclerView.layoutManager = GridLayoutManager(context, SPAN_COUNT)
@@ -80,6 +79,11 @@ class ProductFragment : BaseFragment() {
 
             this.viewModel.onLoginExpired.observeOn(AndroidSchedulers.mainThread())
                     .subscribe(this::loginExpired) { }.addBug(this.subscriptions)
+            this.viewModel.isRefreshing.replaceObserve(this, Observer {
+                if (!it.unwrap && binding.swipeRefresh.isRefreshing) {
+                    binding.swipeRefresh.isRefreshing = false
+                }
+            })
 
             this.viewModel.initialize()
         }

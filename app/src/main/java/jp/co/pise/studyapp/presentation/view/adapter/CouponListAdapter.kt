@@ -1,12 +1,14 @@
 package jp.co.pise.studyapp.presentation.view.adapter
 
 import android.arch.lifecycle.LifecycleOwner
+import android.arch.lifecycle.Observer
 import android.databinding.DataBindingUtil
 import android.databinding.ObservableArrayList
 import android.databinding.ObservableList
 import android.graphics.Paint
 import android.support.v7.widget.RecyclerView
 import android.text.TextUtils
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -17,6 +19,7 @@ import jp.co.pise.studyapp.extension.addBug
 import jp.co.pise.studyapp.presentation.viewmodel.adapter.CouponListItemViewModel
 import jp.co.pise.studyapp.databinding.ItemCouponListBinding
 import jp.co.pise.studyapp.extension.owner
+import jp.co.pise.studyapp.extension.replaceObserve
 import jp.co.pise.studyapp.extension.resizeFromDimen
 
 class CouponListAdapter(viewModels: ObservableArrayList<CouponListItemViewModel>, owner: LifecycleOwner) : BaseAdapter<CouponListItemViewModel, CouponListAdapter.ViewHolder>(viewModels, owner) {
@@ -60,9 +63,9 @@ class CouponListAdapter(viewModels: ObservableArrayList<CouponListItemViewModel>
                 .subscribe(this::loginExpired) {}.addBug(this.subscriptions)
     }
 
-    class ViewHolder(view: View, owner: LifecycleOwner) : RecyclerView.ViewHolder(view) {
-        private val binding: ItemCouponListBinding =
-                DataBindingUtil.bind<ItemCouponListBinding>(view)!!.owner(owner)
+    class ViewHolder(root: View, private val owner: LifecycleOwner) : RecyclerView.ViewHolder(root) {
+        val binding =
+                DataBindingUtil.bind<ItemCouponListBinding>(root)!!.owner(this.owner)
 
         init {
             this.binding.productPriceWithoutTax.paintFlags =
@@ -73,14 +76,14 @@ class CouponListAdapter(viewModels: ObservableArrayList<CouponListItemViewModel>
 
         fun update(viewModel: CouponListItemViewModel) {
             this.binding.viewModel = viewModel
-            updateImage(viewModel)
+            viewModel.imageUrl.replaceObserve(this.owner, Observer { updateImage(it) })
         }
 
-        private fun updateImage(viewModel: CouponListItemViewModel) {
+        private fun updateImage(imageUrl: String?) {
             try {
-                if (!TextUtils.isEmpty(viewModel.imageUrl.value)) {
+                if (!TextUtils.isEmpty(imageUrl)) {
                     this.binding.image.resizeFromDimen(
-                            viewModel.imageUrl.value!!,
+                            imageUrl!!,
                             R.dimen.coupon_image_width,
                             R.dimen.coupon_image_height)
                     this.binding.image.visibility = View.VISIBLE

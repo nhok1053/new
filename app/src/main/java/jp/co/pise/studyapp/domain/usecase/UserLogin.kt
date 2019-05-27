@@ -10,6 +10,9 @@ import jp.co.pise.studyapp.extension.onSafeError
 import javax.inject.Inject
 
 class UserLogin @Inject constructor(private val userRepository: IUserRepository) : Usecase() {
+    init {
+        this.userRepository.addBug(this.subscriptions)
+    }
 
     fun login(model: LoginChallenge): Single<LoginUser> {
         return this.userRepository.login(model).flatMap<LoginResult> { loginResult ->

@@ -9,20 +9,25 @@ import android.text.TextUtils
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.FrameLayout
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.disposables.Disposable
 import jp.co.pise.studyapp.R
 import jp.co.pise.studyapp.databinding.DrawerHeaderBinding
 import jp.co.pise.studyapp.domain.model.LoginUser
+import jp.co.pise.studyapp.extension.addBug
 import jp.co.pise.studyapp.extension.owner
+import jp.co.pise.studyapp.extension.replaceObserve
 import jp.co.pise.studyapp.extension.resizeFromDimen
 import jp.co.pise.studyapp.presentation.StudyApp
 import jp.co.pise.studyapp.presentation.viewmodel.customview.DrawerHeaderViewModel
 import javax.inject.Inject
 
 @SuppressLint("ViewConstructor")
-class DrawerHeaderView(context: Context, owner: LifecycleOwner) : FrameLayout(context) {
+class DrawerHeaderView(context: Context, owner: LifecycleOwner) : FrameLayout(context), Disposable {
     @Inject
     lateinit var viewModel: DrawerHeaderViewModel
     private val binding: DrawerHeaderBinding
+    private val subscriptions = CompositeDisposable()
 
     init {
         StudyApp.instance.appComponent.inject(this)
@@ -31,11 +36,12 @@ class DrawerHeaderView(context: Context, owner: LifecycleOwner) : FrameLayout(co
                 .inflate<DrawerHeaderBinding>(LayoutInflater.from(context), R.layout.drawer_header, this, true)
                 .owner(owner)
         this.binding.viewModel = this.viewModel
+        this.viewModel.addBug(this.subscriptions)
 
-        this.viewModel.imageUrl.observe(owner, Observer { updateImage(it) })
+        this.viewModel.imageUrl.replaceObserve(owner, Observer { updateImage(it) })
     }
 
-    fun setLogin(isLogin: Boolean, loginUser: LoginUser) {
+    fun setLogin(isLogin: Boolean, loginUser: LoginUser?) {
         this.viewModel.setLogin(isLogin, loginUser)
     }
 
@@ -53,5 +59,14 @@ class DrawerHeaderView(context: Context, owner: LifecycleOwner) : FrameLayout(co
         } catch (e: Exception) {
             this.binding.image.visibility = View.INVISIBLE
         }
+    }
+
+    override fun isDisposed(): Boolean {
+        return this.subscriptions.isDisposed
+    }
+
+    override fun dispose() {
+        if (!this.subscriptions.isDisposed)
+            this.subscriptions.dispose()
     }
 }

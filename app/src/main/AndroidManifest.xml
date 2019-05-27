@@ -12,7 +12,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name="jp.co.pise.studyapp.presentation.view.activity.SplashActivity"
+            android:name=".presentation.view.activity.SplashActivity"
             android:screenOrientation="portrait"
             android:launchMode="singleTask">
             <intent-filter>
@@ -21,6 +21,14 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
+        <activity
+            android:name=".presentation.view.activity.MainActivity"
+            android:screenOrientation="portrait"
+            android:launchMode="singleTask"/>
+        <activity
+            android:name=".presentation.view.activity.LoginActivity"
+            android:label="@string/login_title"
+            android:screenOrientation="portrait"
+            android:launchMode="singleTask"/>
     </application>
-
 </manifest>

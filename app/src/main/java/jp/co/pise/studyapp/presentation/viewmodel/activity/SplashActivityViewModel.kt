@@ -14,6 +14,10 @@ import jp.co.pise.studyapp.presentation.viewmodel.BaseViewModel
 import javax.inject.Inject
 
 class SplashActivityViewModel @Inject constructor(private val userLogin: UserLogin) : BaseViewModel() {
+    init {
+        this.userLogin.addBug(this.subscriptions)
+    }
+
     private val _isLoading = MutableLiveData<Boolean>().default(false)
     val isLoading: LiveData<Boolean> = this._isLoading
 

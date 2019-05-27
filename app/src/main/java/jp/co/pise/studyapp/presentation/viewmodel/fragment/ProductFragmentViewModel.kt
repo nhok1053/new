@@ -8,6 +8,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import jp.co.pise.studyapp.domain.usecase.ProductDisplay
 import jp.co.pise.studyapp.domain.usecase.UserLogin
+import jp.co.pise.studyapp.extension.addBug
 import jp.co.pise.studyapp.extension.default
 import jp.co.pise.studyapp.presentation.viewmodel.LoginOperationViewModel
 import jp.co.pise.studyapp.presentation.viewmodel.adapter.NewsListItemViewModel
@@ -57,6 +58,6 @@ class ProductFragmentViewModel @Inject constructor(userLogin: UserLogin, private
             }
             action?.invoke()
         }, { t -> checkLoginExpired(t, action) })
-        this.subscriptions.add(this.getProductDisposable!!)
+        this.getProductDisposable?.addBug(this.subscriptions)
     }
 }

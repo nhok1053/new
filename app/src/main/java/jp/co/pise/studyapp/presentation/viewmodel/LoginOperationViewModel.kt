@@ -10,6 +10,10 @@ import jp.co.pise.studyapp.framework.rx.UserNotLoggedInMessage
 import jp.co.pise.studyapp.presentation.StudyAppException
 
 abstract class LoginOperationViewModel(protected var userLogin: UserLogin) : BaseViewModel() {
+    init {
+        this.userLogin.addBug(this.subscriptions)
+    }
+
     val onLoginExpired: Observable<LoginExpiredMessage> = this.messenger.register(LoginExpiredMessage::class.java)
     val onUserNotLoggedIn: Observable<UserNotLoggedInMessage> = this.messenger.register(UserNotLoggedInMessage::class.java)
 

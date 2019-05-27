@@ -40,6 +40,9 @@ private const val PRICE_WITHOUT_TAX_FORMAT = "%s"
 private const val PRICE_IN_TAX_FORMAT = "(税込：%s)"
 
 class CouponListItemViewModel @Inject constructor(userLogin: UserLogin, private val couponUse: CouponUse) : LoginOperationViewModel(userLogin) {
+    init {
+        this.couponUse.addBug(this.subscriptions)
+    }
 
     // region <----- data ----->
 

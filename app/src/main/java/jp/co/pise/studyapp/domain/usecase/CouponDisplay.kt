@@ -9,9 +9,14 @@ import jp.co.pise.studyapp.domain.model.GetCouponChallenge
 import jp.co.pise.studyapp.domain.model.GetCouponResult
 import jp.co.pise.studyapp.domain.model.GetStoredUserChallenge
 import jp.co.pise.studyapp.domain.model.LoginUser
+import jp.co.pise.studyapp.extension.addBug
 import javax.inject.Inject
 
 class CouponDisplay @Inject constructor(private val couponRepository: ICouponRepository, private val userRepository: IUserRepository) : Usecase() {
+    init {
+        this.couponRepository.addBug(this.subscriptions)
+        this.userRepository.addBug(this.subscriptions)
+    }
 
     fun getCoupon(model: GetCouponChallenge): Single<GetCouponResult> =
             if (model.isLogin && model.loginUser != null) getCouponLogin(model.loginUser) else getCouponNoLogin()

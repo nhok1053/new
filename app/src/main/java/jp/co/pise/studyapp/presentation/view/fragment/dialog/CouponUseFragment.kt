@@ -2,6 +2,7 @@ package jp.co.pise.studyapp.presentation.view.fragment.dialog
 
 import android.annotation.SuppressLint
 import android.app.Dialog
+import android.arch.lifecycle.Observer
 import android.content.Context
 import android.databinding.DataBindingUtil
 import android.graphics.Color
@@ -17,6 +18,7 @@ import jp.co.pise.studyapp.databinding.FragmentCouponUseBinding
 import jp.co.pise.studyapp.domain.model.GetCouponItemModel
 import jp.co.pise.studyapp.extension.addBug
 import jp.co.pise.studyapp.extension.owner
+import jp.co.pise.studyapp.extension.replaceObserve
 import jp.co.pise.studyapp.extension.resizeFromDimen
 import jp.co.pise.studyapp.presentation.viewmodel.fragment.dialog.CouponUseFragmentViewModel
 
@@ -61,11 +63,19 @@ class CouponUseFragment : BaseDialogFragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        if (arguments != null && arguments!!.getSerializable(COUPON) is GetCouponItemModel) {
-            val coupon = arguments!!.getSerializable(COUPON) as GetCouponItemModel
-            this.viewModel = CouponUseFragmentViewModel.fromResultItem(coupon)
-            this.viewModel!!.onClose.observeOn(AndroidSchedulers.mainThread())
-                    .subscribe({ dismiss() }, { }).addBug(this.subscriptions)
+        if (arguments != null) {
+            val coupon = arguments!!.getSerializable(COUPON) as GetCouponItemModel?
+            if (coupon != null) {
+                this.viewModel = CouponUseFragmentViewModel.fromResultItem(coupon)
+                this.viewModel!!.onClose.observeOn(AndroidSchedulers.mainThread())
+                        .subscribe({ dismiss() }, { }).addBug(this.subscriptions)
+            } else {
+                this.viewModel?.dispose()
+                this.viewModel = null
+            }
+        } else {
+            this.viewModel?.dispose()
+            this.viewModel = null
         }
     }
 
@@ -84,6 +94,7 @@ class CouponUseFragment : BaseDialogFragment() {
                     ViewGroup.LayoutParams.MATCH_PARENT,
                     ViewGroup.LayoutParams.MATCH_PARENT)
 
+            it.imageUrl.replaceObserve(this, Observer { imageUrl -> setImage(imageUrl) })
             this.binding.viewModel = it
             it.addBug(this.subscriptions)
 
@@ -91,7 +102,6 @@ class CouponUseFragment : BaseDialogFragment() {
             this.binding.parent.setOnTouchListener { _, motionEvent -> gestureDetector?.onTouchEvent(motionEvent) ?: true }
 
             this.isCancelable = false
-            setImage()
         }
 
         return this.binding.root
@@ -125,11 +135,11 @@ class CouponUseFragment : BaseDialogFragment() {
             this.dispose()
     }
 
-    private fun setImage() {
+    private fun setImage(imageUrl: String?) {
         try {
-            if (!TextUtils.isEmpty(viewModel?.imageUrl?.value)) {
+            if (!TextUtils.isEmpty(imageUrl)) {
                 this.binding.image.resizeFromDimen(
-                        viewModel!!.imageUrl.value,
+                        imageUrl!!,
                         R.dimen.coupon_use_image_width,
                         R.dimen.coupon_use_image_height)
                 this.binding.image.visibility = View.VISIBLE

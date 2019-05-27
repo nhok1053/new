@@ -16,6 +16,10 @@ import jp.co.pise.studyapp.presentation.viewmodel.LoginOperationViewModel
 import javax.inject.Inject
 
 class MainActivityViewModel @Inject constructor(userLogin: UserLogin, private val couponUse: CouponUse) : LoginOperationViewModel(userLogin) {
+    init {
+        this.couponUse.addBug(this.subscriptions)
+    }
+
     private val onLogoutSubject = PublishSubject.create<Unit>()
     val onLogout: Observable<Unit> = this.onLogoutSubject
 
@@ -39,7 +43,7 @@ class MainActivityViewModel @Inject constructor(userLogin: UserLogin, private va
     }
 
     fun refreshUsedCoupon(loginUser: LoginUser) {
-        if (this.isLoading.value.unwrap) {
+        if (!this.isLoading.value.unwrap) {
             this._isLoading.postValue(true)
             val model = RefreshUsedCouponChallenge(loginUser)
             this.couponUse.refreshUsedCoupon(model).observeOn(AndroidSchedulers.mainThread()).subscribe({
