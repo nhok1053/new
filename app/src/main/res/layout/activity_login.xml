@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+        <import type="android.view.View" />
+
+        <variable
+            name="viewModel"
+            type="jp.co.pise.studyapp.presentation.viewmodel.activity.LoginActivityViewModel"/>
+    </data>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <android.support.design.widget.AppBarLayout
+            android:id="@+id/appBar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true">
+
+            <include layout="@layout/toolbar" android:id="@+id/toolbar"/>
+
+        </android.support.design.widget.AppBarLayout>
+
+        <RelativeLayout
+            android:id="@+id/content"
+            android:layout_below="@id/appBar"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <LinearLayout
+                android:id="@+id/inputContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:orientation="vertical">
+
+                <TextView
+                    android:text="@string/login_id_caption"
+                    android:textColor="@color/textPrimary"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+
+                <EditText
+                    android:text="@={viewModel.loginId}"
+                    android:textColor="@android:color/white"
+                    android:enabled="@{!viewModel.isLoading}"
+                    android:singleLine="true"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+
+                <TextView
+                    android:text="@string/password_caption"
+                    android:textColor="@color/textPrimary"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+
+                <EditText
+                    android:text="@={viewModel.password}"
+                    android:textColor="@android:color/white"
+                    android:enabled="@{!viewModel.isLoading}"
+                    android:singleLine="true"
+                    android:inputType="textPassword"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+
+                <Button
+                    android:text="@string/login_button_text"
+                    android:textColor="@color/buttonText"
+                    android:textSize="@dimen/body_text_size"
+                    android:textAllCaps="false"
+                    android:background="@drawable/button_selector"
+                    android:enabled="@{!viewModel.isLoading}"
+                    android:clickable="@{!viewModel.isLoading}"
+                    android:onClick="@{() -> viewModel.login()}"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginTop="10dp"
+                    android:layout_width="200dp"
+                    android:layout_height="40dp"/>
+
+            </LinearLayout>
+
+            <TextView
+                android:layout_below="@id/inputContainer"
+                android:textSize="20dp"
+                android:textColor="@color/textPrimary"
+                android:layout_marginTop="10dp"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="10dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@{viewModel.message}"/>
+
+        </RelativeLayout>
+
+        <ProgressBar
+            android:layout_centerInParent="true"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="@{viewModel.isLoading ? View.VISIBLE : View.GONE}"/>
+
+    </RelativeLayout>
+</layout>

@@ -10,6 +10,8 @@ import jp.co.pise.studyapp.presentation.viewmodel.adapter.CouponListItemViewMode
 import jp.co.pise.studyapp.presentation.viewmodel.adapter.NewsListItemViewModel
 import jp.co.pise.studyapp.presentation.viewmodel.adapter.ProductListItemViewModel
 import jp.co.pise.studyapp.presentation.viewmodel.adapter.UsedCouponListItemViewModel
+import jp.co.pise.studyapp.presentation.viewmodel.fragment.dialog.CouponUseFragmentViewModel
+import jp.co.pise.studyapp.presentation.viewmodel.fragment.dialog.ProductDetailFragmentViewModel
 import javax.inject.Singleton
 
 @Singleton
@@ -40,4 +42,6 @@ interface AppComponent {
     fun createNewsListItemViewModel(): NewsListItemViewModel
     fun createProductListItemViewModel(): ProductListItemViewModel
     fun createUsedCouponListItemViewModel(): UsedCouponListItemViewModel
+    fun createProductDetailFragmentViewModel(): ProductDetailFragmentViewModel
+    fun createCouponUseFragmentViewModel(): CouponUseFragmentViewModel
 }

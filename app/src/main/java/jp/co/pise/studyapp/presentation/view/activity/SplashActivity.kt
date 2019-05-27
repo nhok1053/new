@@ -9,9 +9,8 @@ import java.util.*
 import javax.inject.Inject
 
 class SplashActivity : BaseActivity() {
-
     @Inject
-    internal lateinit var viewModel: SplashActivityViewModel
+    lateinit var viewModel: SplashActivityViewModel
 
     private val SPLASH_DISPLAY_MS = 1000
     private var start: Date? = null

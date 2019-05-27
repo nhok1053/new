@@ -21,7 +21,7 @@ import javax.inject.Inject
 @SuppressLint("ViewConstructor")
 class DrawerHeaderView(context: Context, owner: LifecycleOwner) : FrameLayout(context) {
     @Inject
-    internal lateinit var viewModel: DrawerHeaderViewModel
+    lateinit var viewModel: DrawerHeaderViewModel
     private val binding: DrawerHeaderBinding
 
     init {

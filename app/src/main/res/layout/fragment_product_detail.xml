@@ -1,0 +1,65 @@
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+        <import type="android.view.View" />
+
+        <variable
+            name="viewModel"
+            type="jp.co.pise.studyapp.presentation.viewmodel.fragment.dialog.ProductDetailFragmentViewModel" />
+    </data>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="@{() -> viewModel.close()}"
+        android:orientation="vertical">
+
+        <com.facebook.drawee.view.SimpleDraweeView
+            android:id="@+id/image"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginBottom="20dp"
+            app:actualImageScaleType="fitCenter"
+            android:duplicateParentState="true"
+            android:layout_width="@dimen/product_detail_image_height"
+            android:layout_height="@dimen/product_detail_image_width"/>
+
+        <TextView
+            android:text="@{viewModel.name}"
+            android:textSize="@dimen/headline_text_size"
+            android:textColor="@android:color/white"
+            android:singleLine="true"
+            android:ellipsize="end"
+            android:layout_marginBottom="10dp"
+            android:duplicateParentState="true"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+        <TextView
+            android:text="@{viewModel.priceWithoutTax}"
+            android:textSize="@dimen/subhead_text_size"
+            android:textColor="@android:color/white"
+            android:duplicateParentState="true"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+        <TextView
+            android:text="@{viewModel.priceInTax}"
+            android:textSize="@dimen/body_text_size"
+            android:textColor="@android:color/white"
+            android:layout_marginBottom="10dp"
+            android:duplicateParentState="true"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+        <TextView
+            android:text="@{viewModel.description}"
+            android:textSize="@dimen/subhead_text_size"
+            android:textColor="@android:color/white"
+            android:duplicateParentState="true"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+    </LinearLayout>
+</layout>

@@ -23,7 +23,7 @@ import javax.inject.Inject
 
 class CouponFragment : BaseFragment() {
     @Inject
-    internal lateinit var viewModel: CouponFragmentViewModel
+    lateinit var viewModel: CouponFragmentViewModel
     private lateinit var binding: FragmentCouponBinding
     private lateinit var adapter: CouponListAdapter
     private var isCreated = false
