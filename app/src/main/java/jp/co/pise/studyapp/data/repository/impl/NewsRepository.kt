@@ -38,9 +38,7 @@ class NewsRepository @Inject constructor(private val newsApi: NewsApiInterface, 
                 try {
                     this.db.transactionSync {
                         this.db.deleteFromNews().execute()
-                        model.news?.apply {
-                            this.forEach { db.insertIntoNews(it) }
-                        }
+                        model.news?.forEach { db.insertIntoNews(it) }
                     }
                     emitter.onSuccess(SaveNewsResult())
                 } catch (e: Exception) {

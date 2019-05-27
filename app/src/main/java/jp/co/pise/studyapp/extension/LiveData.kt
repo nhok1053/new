@@ -1,10 +1,8 @@
 package jp.co.pise.studyapp.extension
 
-import android.arch.lifecycle.LifecycleOwner
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.Transformations
-import android.databinding.ViewDataBinding
 
 fun <X> MutableLiveData<X>.default(initialValue: X) = apply { setValue(initialValue) }
 fun <X, Y> LiveData<X>.switchMap(func: (X) -> LiveData<Y>) = Transformations.switchMap(this, func)

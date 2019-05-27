@@ -87,7 +87,6 @@ enum class ApiResultCode private constructor(val value: Int) {
             else -> {
             }
         }
-        resultCode.apply {  }
         return resultCode
     }
 

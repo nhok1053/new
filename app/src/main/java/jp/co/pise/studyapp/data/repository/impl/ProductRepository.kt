@@ -34,9 +34,7 @@ class ProductRepository @Inject constructor(private val productApi: ProductApiIn
                 try {
                     this.db.transactionSync {
                         this.db.deleteFromProduct().execute()
-                        model.products?.apply {
-                            this.forEach { db.insertIntoProduct(it) }
-                        }
+                        model.products?.forEach { db.insertIntoProduct(it) }
                         emitter.onSuccess(SaveProductResult())
                     }
                 } catch (e: Exception) {

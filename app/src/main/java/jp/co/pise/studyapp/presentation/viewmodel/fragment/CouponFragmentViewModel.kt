@@ -18,6 +18,8 @@ import javax.inject.Inject
 
 class CouponFragmentViewModel @Inject constructor(userLogin: UserLogin, private val couponDisplay: CouponDisplay) : LoginOperationViewModel(userLogin) {
 
+    private var getCouponDisposable: Disposable? = null
+
     // region <----- data ----->
 
     private val _isLogin = MutableLiveData<Boolean>().default(false)
@@ -32,7 +34,6 @@ class CouponFragmentViewModel @Inject constructor(userLogin: UserLogin, private 
     private val _isRefreshing = MutableLiveData<Boolean>()
     val isRefreshing: LiveData<Boolean> = this._isRefreshing
 
-    private var getCouponDisposable: Disposable? = null
     val couponList = ObservableArrayList<CouponListItemViewModel>()
 
     // endregion
@@ -76,8 +77,8 @@ class CouponFragmentViewModel @Inject constructor(userLogin: UserLogin, private 
                 it.sortOrder
             }?.map {
                 CouponListItemViewModel.fromResultItem(it, _isLogin.value.unwrap, _loginUser.value)
-            }?.toList()?.apply {
-                couponList.addAll(this)
+            }?.toList()?.also {
+                couponList.addAll(it)
             }
             action?.invoke()
 
