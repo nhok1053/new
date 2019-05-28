@@ -113,190 +113,190 @@ class CouponRepository @Inject constructor(private val couponApi: CouponApiInter
     }
 
     // endregion
-
-    //region <------ models ----->
-
-    open class CouponItemApiModel {
-        @Json(name = "id")
-        lateinit var id: String
-            protected set
-
-        @Json(name = "name")
-        var name: String? = null
-            protected set
-
-        @Json(name = "imageUrl")
-        var imageUrl: String? = null
-            protected set
-
-        @Json(name = "description")
-        var description: String? = null
-            protected set
-
-        @Json(name = "priceWithoutTax")
-        var priceWithoutTax: Int = 0
-            protected set
-
-        @Json(name = "priceInTax")
-        var priceInTax: Int = 0
-            protected set
-
-        @Json(name = "productPriceWithoutTax")
-        var productPriceWithoutTax: Int = 0
-            protected set
-
-        @Json(name = "productPriceInTax")
-        var productPriceInTax: Int = 0
-            protected set
-
-        @Json(name = "startDate")
-        var startDate: String? = null
-            protected set
-
-        @Json(name = "endDate")
-        var endDate: String? = null
-            protected set
-
-        @Json(name = "usedLimit")
-        var usedLimit: Int = 0
-            protected set
-
-        @Json(name = "sortOrder")
-        var sortOrder: Int = 0
-            protected set
-    }
-
-    class GetCouponApiChallenge(id: String,
-                                accessToken: String) : JwtAuthChallengeModel(id, accessToken) {
-
-        companion object {
-            fun fromModel(param: GetCouponParam)
-                    = GetCouponApiChallenge(param.user.id, param.user.accessToken)
-        }
-    }
-
-    class GetCouponApiResult : ApiResultModel() {
-        @Json(name = "coupons")
-        var coupons: List<GetCouponItemApiModel>? = null
-            private set
-
-        fun convert(): GetCouponResult {
-            val items: List<GetCouponItemModel> = if (this.coupons != null) {
-                this.coupons!!.map { it.convert() }
-            } else {
-                ArrayList()
-            }
-            return GetCouponResult(items)
-        }
-    }
-
-    class GetCouponItemApiModel : CouponItemApiModel() {
-        @Json(name = "usedCount")
-        var usedCount: Int? = null
-            private set
-
-        fun convert(): GetCouponItemModel {
-            return GetCouponItemModel(
-                    this.id,
-                    this.name,
-                    this.imageUrl,
-                    this.description,
-                    this.priceWithoutTax,
-                    this.priceInTax,
-                    this.productPriceWithoutTax,
-                    this.productPriceInTax,
-                    Utility.stringParseDate(this.startDate, Constant.DEFAULT_FORMAT_YMDHM),
-                    Utility.stringParseDate(this.endDate, Constant.DEFAULT_FORMAT_YMDHM),
-                    this.usedLimit,
-                    this.sortOrder,
-                    this.usedCount)
-        }
-    }
-
-    class UseCouponApiChallenge(@Json(name = "couponId") val couponId: String,
-                                id: String,
-                                accessToken: String) : JwtAuthChallengeModel(id, accessToken) {
-        companion object {
-            fun fromModel(model: UseCouponParam)
-                    = UseCouponApiChallenge(model.couponId, model.user.id, model.user.accessToken)
-        }
-    }
-
-    class UseCouponApiResult : ApiResultModel() {
-        @Json(name = "couponId")
-        var couponId: String? = null
-            private set
-
-        @Json(name = "usedCount")
-        var usedCount: Int = 0
-            private set
-
-        fun convert(): UseCouponResult {
-            return UseCouponResult(
-                    this.couponId,
-                    this.usedCount)
-        }
-    }
-
-    class GetUsedCouponApiChallenge(id: String,
-                                    accessToken: String) : JwtAuthChallengeModel(id, accessToken) {
-        companion object {
-            fun fromModel(model: GetUsedCouponParam)
-                    = GetUsedCouponApiChallenge(model.user.id, model.user.accessToken)
-        }
-    }
-
-    class GetUsedCouponApiResult : ApiResultModel() {
-        @Json(name = "usedCoupons")
-        var usedCoupons: List<GetUsedCouponItemApiModel>? = null
-            private set
-
-        fun convert(): GetUsedCouponResult {
-            var items: List<GetUsedCouponItemModel> = if (this.usedCoupons != null) {
-                this.usedCoupons!!.map { it.convert() }
-            } else {
-                ArrayList()
-            }
-            return GetUsedCouponResult(items)
-        }
-    }
-
-    class GetUsedCouponItemApiModel : CouponItemApiModel() {
-        @Json(name = "usedTime")
-        lateinit var usedTime: String
-            private set
-
-        fun convert(): GetUsedCouponItemModel {
-            return GetUsedCouponItemModel(
-                    this.id,
-                    this.name,
-                    this.imageUrl,
-                    this.description,
-                    this.priceWithoutTax,
-                    this.priceInTax,
-                    this.productPriceWithoutTax,
-                    this.productPriceInTax,
-                    Utility.stringParseDate(this.startDate, Constant.DEFAULT_FORMAT_YMDHM),
-                    Utility.stringParseDate(this.endDate, Constant.DEFAULT_FORMAT_YMDHM),
-                    this.usedLimit,
-                    this.sortOrder,
-                    Utility.stringParseDate(this.usedTime, Constant.DEFAULT_FORMAT_YMDHM))
-        }
-    }
-
-    class RefreshUsedCouponApiChallenge(id: String,
-                                        accessToken: String) : JwtAuthChallengeModel(id, accessToken) {
-        companion object {
-            fun fromModel(model: RefreshUsedCouponParam)
-                    = RefreshUsedCouponApiChallenge(model.user.id, model.user.accessToken)
-        }
-    }
-
-    class RefreshUsedCouponApiResult : ApiResultModel() {
-        fun convert(): RefreshUsedCouponResult {
-            return RefreshUsedCouponResult()
-        }
-    }
-
-    //endregion
 }
+
+//region <------ models ----->
+
+open class CouponItemApiModel {
+    @Json(name = "id")
+    lateinit var id: String
+        protected set
+
+    @Json(name = "name")
+    var name: String? = null
+        protected set
+
+    @Json(name = "imageUrl")
+    var imageUrl: String? = null
+        protected set
+
+    @Json(name = "description")
+    var description: String? = null
+        protected set
+
+    @Json(name = "priceWithoutTax")
+    var priceWithoutTax: Int = 0
+        protected set
+
+    @Json(name = "priceInTax")
+    var priceInTax: Int = 0
+        protected set
+
+    @Json(name = "productPriceWithoutTax")
+    var productPriceWithoutTax: Int = 0
+        protected set
+
+    @Json(name = "productPriceInTax")
+    var productPriceInTax: Int = 0
+        protected set
+
+    @Json(name = "startDate")
+    var startDate: String? = null
+        protected set
+
+    @Json(name = "endDate")
+    var endDate: String? = null
+        protected set
+
+    @Json(name = "usedLimit")
+    var usedLimit: Int = 0
+        protected set
+
+    @Json(name = "sortOrder")
+    var sortOrder: Int = 0
+        protected set
+}
+
+class GetCouponApiChallenge(id: String,
+                            accessToken: String) : JwtAuthChallengeModel(id, accessToken) {
+
+    companion object {
+        fun fromModel(param: GetCouponParam)
+                = GetCouponApiChallenge(param.user.id, param.user.accessToken)
+    }
+}
+
+class GetCouponApiResult : ApiResultModel() {
+    @Json(name = "coupons")
+    var coupons: List<GetCouponItemApiModel>? = null
+        private set
+
+    fun convert(): GetCouponResult {
+        val items: List<GetCouponItemModel> = if (this.coupons != null) {
+            this.coupons!!.map { it.convert() }
+        } else {
+            ArrayList()
+        }
+        return GetCouponResult(items)
+    }
+}
+
+class GetCouponItemApiModel : CouponItemApiModel() {
+    @Json(name = "usedCount")
+    var usedCount: Int? = null
+        private set
+
+    fun convert(): GetCouponItemModel {
+        return GetCouponItemModel(
+                this.id,
+                this.name,
+                this.imageUrl,
+                this.description,
+                this.priceWithoutTax,
+                this.priceInTax,
+                this.productPriceWithoutTax,
+                this.productPriceInTax,
+                Utility.stringParseDate(this.startDate, Constant.DEFAULT_FORMAT_YMDHM),
+                Utility.stringParseDate(this.endDate, Constant.DEFAULT_FORMAT_YMDHM),
+                this.usedLimit,
+                this.sortOrder,
+                this.usedCount)
+    }
+}
+
+class UseCouponApiChallenge(@Json(name = "couponId") val couponId: String,
+                            id: String,
+                            accessToken: String) : JwtAuthChallengeModel(id, accessToken) {
+    companion object {
+        fun fromModel(model: UseCouponParam)
+                = UseCouponApiChallenge(model.couponId, model.user.id, model.user.accessToken)
+    }
+}
+
+class UseCouponApiResult : ApiResultModel() {
+    @Json(name = "couponId")
+    var couponId: String? = null
+        private set
+
+    @Json(name = "usedCount")
+    var usedCount: Int = 0
+        private set
+
+    fun convert(): UseCouponResult {
+        return UseCouponResult(
+                this.couponId,
+                this.usedCount)
+    }
+}
+
+class GetUsedCouponApiChallenge(id: String,
+                                accessToken: String) : JwtAuthChallengeModel(id, accessToken) {
+    companion object {
+        fun fromModel(model: GetUsedCouponParam)
+                = GetUsedCouponApiChallenge(model.user.id, model.user.accessToken)
+    }
+}
+
+class GetUsedCouponApiResult : ApiResultModel() {
+    @Json(name = "usedCoupons")
+    var usedCoupons: List<GetUsedCouponItemApiModel>? = null
+        private set
+
+    fun convert(): GetUsedCouponResult {
+        var items: List<GetUsedCouponItemModel> = if (this.usedCoupons != null) {
+            this.usedCoupons!!.map { it.convert() }
+        } else {
+            ArrayList()
+        }
+        return GetUsedCouponResult(items)
+    }
+}
+
+class GetUsedCouponItemApiModel : CouponItemApiModel() {
+    @Json(name = "usedTime")
+    lateinit var usedTime: String
+        private set
+
+    fun convert(): GetUsedCouponItemModel {
+        return GetUsedCouponItemModel(
+                this.id,
+                this.name,
+                this.imageUrl,
+                this.description,
+                this.priceWithoutTax,
+                this.priceInTax,
+                this.productPriceWithoutTax,
+                this.productPriceInTax,
+                Utility.stringParseDate(this.startDate, Constant.DEFAULT_FORMAT_YMDHM),
+                Utility.stringParseDate(this.endDate, Constant.DEFAULT_FORMAT_YMDHM),
+                this.usedLimit,
+                this.sortOrder,
+                Utility.stringParseDate(this.usedTime, Constant.DEFAULT_FORMAT_YMDHM))
+    }
+}
+
+class RefreshUsedCouponApiChallenge(id: String,
+                                    accessToken: String) : JwtAuthChallengeModel(id, accessToken) {
+    companion object {
+        fun fromModel(model: RefreshUsedCouponParam)
+                = RefreshUsedCouponApiChallenge(model.user.id, model.user.accessToken)
+    }
+}
+
+class RefreshUsedCouponApiResult : ApiResultModel() {
+    fun convert(): RefreshUsedCouponResult {
+        return RefreshUsedCouponResult()
+    }
+}
+
+//endregion
