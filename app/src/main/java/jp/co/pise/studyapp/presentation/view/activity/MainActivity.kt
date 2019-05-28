@@ -3,8 +3,10 @@ package jp.co.pise.studyapp.presentation.view.activity
 import android.content.Context
 import android.content.Intent
 import android.databinding.DataBindingUtil
+import android.os.Build
 import android.os.Bundle
 import android.support.v4.app.Fragment
+import android.support.v4.content.ContextCompat
 import android.support.v4.view.GravityCompat
 import android.support.v7.app.ActionBarDrawerToggle
 import android.support.v7.widget.Toolbar
@@ -44,10 +46,6 @@ class MainActivity : BaseActivity(),
 
     private lateinit var binding: ActivityMainBinding
     private lateinit var drawerHeaderView: DrawerHeaderView
-
-    private var newsFragment: NewsFragment? = null
-    private var couponFragment: CouponFragment? = null
-    private var productFragment: ProductFragment? = null
 
     companion object {
         const val TAG = "MainActivity"
@@ -108,7 +106,7 @@ class MainActivity : BaseActivity(),
                     R.string.drawer_open,
                     R.string.drawer_close)
             this.binding.drawerLayout.addDrawerListener(toggle)
-            this.binding.drawerLayout.setScrimColor(resources.getColor(R.color.menuScrim))
+            this.binding.drawerLayout.setScrimColor(ContextCompat.getColor(this, R.color.menuScrim))
             this.binding.navigationView.setNavigationItemSelectedListener { menuItem ->
                 when (menuItem.itemId) {
                     R.id.usedCoupon -> {
@@ -143,22 +141,9 @@ class MainActivity : BaseActivity(),
             true
         }
 
-        // Initialize Fragment
-        this.couponFragment = supportFragmentManager.findFragmentByTag(CouponFragment.TAG) as CouponFragment?
-        if (this.couponFragment == null)
-            this.couponFragment = createCouponFragment()
-
-        this.productFragment = supportFragmentManager.findFragmentByTag(ProductFragment.TAG) as ProductFragment?
-        if (this.productFragment == null)
-            this.productFragment = createProductFragment()
-
-        this.newsFragment = supportFragmentManager.findFragmentByTag(NewsFragment.TAG) as NewsFragment?
-        if (this.newsFragment == null)
-            this.newsFragment = createNewsFragment()
-
         // 再生成でない場合のみ初期選択にする
         if (savedInstanceState == null)
-            replaceContainer(this.newsFragment, NewsFragment.TAG, resources.getString(R.string.news_tab_title))
+            replaceNewsFragment()
     }
 
     // region <----- private method ----->
@@ -188,48 +173,36 @@ class MainActivity : BaseActivity(),
     }
 
     private fun replaceNewsFragment() {
-        this.newsFragment?.dispose()
-        this.newsFragment = createNewsFragment()
-        replaceContainer(this.newsFragment, NewsFragment.TAG, resources.getString(R.string.news_tab_title))
+        replaceContainer(createNewsFragment(), NewsFragment.TAG, resources.getString(R.string.news_tab_title))
     }
 
     private fun replaceCouponFragment() {
-        this.couponFragment?.dispose()
-        this.couponFragment = createCouponFragment()
-        replaceContainer(this.couponFragment, CouponFragment.TAG, resources.getString(R.string.coupon_tab_title))
+        replaceContainer(createCouponFragment(), CouponFragment.TAG, resources.getString(R.string.coupon_tab_title))
     }
 
     private fun replaceProductFragment() {
-        this.productFragment?.dispose()
-        this.productFragment = createProductFragment()
-        replaceContainer(this.productFragment, ProductFragment.TAG, resources.getString(R.string.product_tab_title))
+        replaceContainer(createProductFragment(), ProductFragment.TAG, resources.getString(R.string.product_tab_title))
     }
 
     private fun createNewsFragment(): NewsFragment {
-        val fragment = NewsFragment.newInstance()
-        fragment.addBug(this.subscriptions)
-        return fragment
+        return NewsFragment.newInstance()
     }
 
     private fun createCouponFragment(): CouponFragment {
-        val fragment = CouponFragment.newInstance()
-        fragment.addBug(this.subscriptions)
-        return fragment
+        return CouponFragment.newInstance()
     }
 
     private fun createProductFragment(): ProductFragment {
-        val fragment = ProductFragment.newInstance()
-        fragment.addBug(this.subscriptions)
-        return fragment
+        return ProductFragment.newInstance()
     }
 
-    private fun replaceContainer(fragment: Fragment?, tag: String, title: String) {
+    private fun replaceContainer(fragment: Fragment, tag: String, title: String) {
         if (supportActionBar != null)
             supportActionBar!!.title = title
 
         val fragmentManager = supportFragmentManager
         val transaction = fragmentManager.beginTransaction()
-        transaction.replace(R.id.container, fragment!!, tag)
+        transaction.replace(R.id.container, fragment, tag)
         transaction.commit()
     }
 
@@ -247,8 +220,7 @@ class MainActivity : BaseActivity(),
     }
 
     override fun onUseCoupon(model: GetCouponItemModel) {
-        if (this.couponFragment != null)
-            this.couponFragment!!.useCoupon(model)
+        (supportFragmentManager.findFragmentByTag(CouponFragment.TAG) as CouponFragment?)?.useCoupon(model)
     }
 
     override fun onShowProductDetail(model: ProductItemModel) {
