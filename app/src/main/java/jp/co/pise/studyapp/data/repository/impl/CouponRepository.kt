@@ -116,6 +116,56 @@ class CouponRepository @Inject constructor(private val couponApi: CouponApiInter
 
     //region <------ models ----->
 
+    open class CouponItemApiModel {
+        @Json(name = "id")
+        lateinit var id: String
+            protected set
+
+        @Json(name = "name")
+        var name: String? = null
+            protected set
+
+        @Json(name = "imageUrl")
+        var imageUrl: String? = null
+            protected set
+
+        @Json(name = "description")
+        var description: String? = null
+            protected set
+
+        @Json(name = "priceWithoutTax")
+        var priceWithoutTax: Int = 0
+            protected set
+
+        @Json(name = "priceInTax")
+        var priceInTax: Int = 0
+            protected set
+
+        @Json(name = "productPriceWithoutTax")
+        var productPriceWithoutTax: Int = 0
+            protected set
+
+        @Json(name = "productPriceInTax")
+        var productPriceInTax: Int = 0
+            protected set
+
+        @Json(name = "startDate")
+        var startDate: String? = null
+            protected set
+
+        @Json(name = "endDate")
+        var endDate: String? = null
+            protected set
+
+        @Json(name = "usedLimit")
+        var usedLimit: Int = 0
+            protected set
+
+        @Json(name = "sortOrder")
+        var sortOrder: Int = 0
+            protected set
+    }
+
     class GetCouponApiChallenge(id: String,
                                 accessToken: String) : JwtAuthChallengeModel(id, accessToken) {
 

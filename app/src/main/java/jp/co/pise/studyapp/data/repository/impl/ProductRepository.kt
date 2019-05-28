@@ -60,4 +60,40 @@ class GetProductApiResult : ApiResultModel() {
     }
 }
 
+open class ProductItemApiModel {
+    @Json(name = "id")
+    lateinit var id: String
+        protected set
+
+    @Json(name = "name")
+    var name: String? = null
+        protected set
+
+    @Json(name = "description")
+    var description: String? = null
+        protected set
+
+    @Json(name = "imageUrl")
+    var imageUrl: String? = null
+        protected set
+
+    @Json(name = "priceWithoutTax")
+    var priceWithoutTax: Int = 0
+        protected set
+
+    @Json(name = "priceInTax")
+    var priceInTax: Int = 0
+        protected set
+
+    fun convert(): ProductItemModel {
+        return ProductItemModel(
+                this.id,
+                this.name,
+                this.description,
+                this.imageUrl,
+                this.priceWithoutTax,
+                this.priceInTax)
+    }
+}
+
 // endregion
