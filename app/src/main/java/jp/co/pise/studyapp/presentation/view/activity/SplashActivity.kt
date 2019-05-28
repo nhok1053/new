@@ -27,6 +27,8 @@ class SplashActivity : BaseActivity() {
         AndroidInjection.inject(this)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_splash)
+
+        // setting view model
         this.viewModel.addBug(this.subscriptions)
 
         // ログイン状態初期化

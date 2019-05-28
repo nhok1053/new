@@ -14,6 +14,9 @@ import jp.co.pise.studyapp.presentation.viewmodel.adapter.NewsListItemViewModel
 import javax.inject.Inject
 
 class NewsFragmentViewModel @Inject constructor(userLogin: UserLogin, private val newsDisplay: NewsDisplay) : LoginOperationViewModel(userLogin) {
+    init {
+        this.newsDisplay.addBug(this.subscriptions)
+    }
 
     private var getNewsDisposable: Disposable? = null
 

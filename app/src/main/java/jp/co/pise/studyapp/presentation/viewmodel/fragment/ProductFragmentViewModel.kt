@@ -16,6 +16,9 @@ import jp.co.pise.studyapp.presentation.viewmodel.adapter.ProductListItemViewMod
 import javax.inject.Inject
 
 class ProductFragmentViewModel @Inject constructor(userLogin: UserLogin, private val productDisplay: ProductDisplay) : LoginOperationViewModel(userLogin) {
+    init {
+        this.productDisplay.addBug(this.subscriptions)
+    }
 
     private var getProductDisposable: Disposable? = null
 

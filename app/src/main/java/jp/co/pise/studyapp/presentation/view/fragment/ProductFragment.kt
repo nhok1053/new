@@ -60,14 +60,17 @@ class ProductFragment : BaseFragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
 
+        // setting binding
         this.binding = DataBindingUtil
                 .inflate<FragmentProductBinding>(inflater, R.layout.fragment_product, container, false)
                 .owner(this)
         this.binding.viewModel = this.viewModel
         this.viewModel.addBug(this.subscriptions)
 
+        // setting swipe refresh
         this.binding.swipeRefresh.setOnRefreshListener { this.viewModel.refresh() }
 
+        // setting adapter
         this.adapter = ProductListAdapter(this.viewModel.productList, this)
         this.binding.recyclerView.layoutManager = GridLayoutManager(context, SPAN_COUNT)
         this.binding.recyclerView.adapter = this.adapter
@@ -75,8 +78,9 @@ class ProductFragment : BaseFragment() {
                 .subscribe({ itemViewModel -> showProductDetail(itemViewModel.toItemModel()) }, { }).addBug(this.subscriptions)
         this.adapter.addBug(this.subscriptions)
 
+        // setting view model message
         this.viewModel.onLoginExpired.observeOn(AndroidSchedulers.mainThread())
-                .subscribe(this::loginExpired) { }.addBug(this.subscriptions)
+                .subscribe(this::doLoginExpired) { }.addBug(this.subscriptions)
         this.viewModel.isRefreshing.replaceObserve(this, Observer {
             if (!it.unwrap && binding.swipeRefresh.isRefreshing) {
                 binding.swipeRefresh.isRefreshing = false

@@ -25,16 +25,20 @@ class LoginActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         AndroidInjection.inject(this)
         super.onCreate(savedInstanceState)
+
+        // setting binding
         this.binding = DataBindingUtil
                 .setContentView<ActivityLoginBinding>(this, R.layout.activity_login)
                 .owner(this)
         this.binding.viewModel = viewModel
         this.viewModel.addBug(this.subscriptions)
 
+        // setting toolbar
         (this.binding.toolbar as Toolbar?)?.let {
             setSupportActionBar(it)
         }
 
+        // setting listener
         this.binding.content.setOnClickListener {
             val currentFocus = currentFocus
             if (currentFocus != null) {

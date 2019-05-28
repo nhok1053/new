@@ -3,7 +3,6 @@ package jp.co.pise.studyapp.presentation.view.activity
 import android.content.Context
 import android.content.Intent
 import android.databinding.DataBindingUtil
-import android.os.Build
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v4.content.ContextCompat
@@ -58,32 +57,29 @@ class MainActivity : BaseActivity(),
     override fun onCreate(savedInstanceState: Bundle?) {
         AndroidInjection.inject(this)
         super.onCreate(savedInstanceState)
+
+        // setting binding
         this.binding = DataBindingUtil
                 .setContentView<ActivityMainBinding>(this, R.layout.activity_main)
                 .owner(this)
         this.binding.viewModel = viewModel
         this.viewModel.addBug(this.subscriptions)
 
+        // setting view model message
         this.viewModel.onLogout.observeOn(AndroidSchedulers.mainThread())
-                .subscribe({
-                    StudyApp.instance.logout()
-                    Toast.makeText(this, Message.LOGOUT, Toast.LENGTH_SHORT).show()
-                }, { }).addBug(this.subscriptions)
+                .subscribe({ doLogout() }, { }).addBug(this.subscriptions)
         this.viewModel.onRefreshUsedCoupon.observeOn(AndroidSchedulers.mainThread())
-                .subscribe({ isSuccess ->
-                    if (isSuccess) {
-                        StudyApp.instance.sendRefreshedUsedCoupon()
-                        Toast.makeText(this, Message.REFRESH_USED_COUPON_SUCCESS, Toast.LENGTH_SHORT).show()
-                    }
-                }, { }).addBug(this.subscriptions)
+                .subscribe(this::doRefreshedUsedCoupon) { }.addBug(this.subscriptions)
         this.viewModel.onLoginExpired.observeOn(AndroidSchedulers.mainThread())
-                .subscribe(this::loginExpired) { }.addBug(this.subscriptions)
+                .subscribe(this::doLoginExpired) { }.addBug(this.subscriptions)
+
+        // setting app message
         StudyApp.instance.onLoginStateChange.observeOn(AndroidSchedulers.mainThread())
-                .subscribe({ loginStateChanged() }, { }).addBug(this.subscriptions)
+                .subscribe({ onLoginStateChanged() }, { }).addBug(this.subscriptions)
         StudyApp.instance.onLoginExpired.observeOn(AndroidSchedulers.mainThread())
                 .subscribe({ onLoginExpired() }, { }).addBug(this.subscriptions)
 
-        // Drawer Setting
+        // setting drawer
         if (this.binding.navigationView.headerCount > 0) {
             // Headerが存在する場合全てRemoveする
             for (index in this.binding.navigationView.headerCount - 1 downTo 0) {
@@ -96,7 +92,7 @@ class MainActivity : BaseActivity(),
         settingDrawerMenu()
         this.drawerHeaderView.addBug(this.subscriptions)
 
-        // Toolbar Setting
+        // setting toolbar
         (this.binding.toolbar as Toolbar?)?.let { toolbar ->
             setSupportActionBar(toolbar)
 
@@ -131,7 +127,7 @@ class MainActivity : BaseActivity(),
             toggle.syncState()
         }
 
-        // BottomNavigation Setting
+        // setting bottom navigation
         this.binding.bottomNavigation.setOnNavigationItemSelectedListener { menuItem ->
             when (menuItem.itemId) {
                 R.id.nav_news -> replaceNewsFragment()
@@ -148,7 +144,19 @@ class MainActivity : BaseActivity(),
 
     // region <----- private method ----->
 
-    private fun loginStateChanged() {
+    private fun doLogout() {
+        StudyApp.instance.logout()
+        Toast.makeText(this, Message.LOGOUT, Toast.LENGTH_SHORT).show()
+    }
+
+    private fun doRefreshedUsedCoupon(isSuccess: Boolean) {
+        if (isSuccess) {
+            StudyApp.instance.doRefreshedUsedCoupon()
+            Toast.makeText(this, Message.REFRESH_USED_COUPON_SUCCESS, Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun onLoginStateChanged() {
         settingDrawerHeader()
         settingDrawerMenu()
     }

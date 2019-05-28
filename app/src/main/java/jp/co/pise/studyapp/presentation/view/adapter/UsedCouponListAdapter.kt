@@ -27,15 +27,6 @@ class UsedCouponListAdapter(viewModels: ObservableArrayList<UsedCouponListItemVi
         return this.viewModels.size
     }
 
-    override fun dispose() {
-        if (!this.subscriptions.isDisposed)
-            this.subscriptions.dispose()
-    }
-
-    override fun isDisposed(): Boolean {
-        return this.subscriptions.isDisposed
-    }
-
     class ViewHolder(root: View, private val owner: LifecycleOwner) : RecyclerView.ViewHolder(root) {
         val binding =
                 DataBindingUtil.bind<ItemUsedCouponListBinding>(root)!!.owner(this.owner)

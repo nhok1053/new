@@ -71,9 +71,12 @@ class StudyApp : Application(), HasActivityInjector, HasSupportFragmentInjector 
 
     // region <----- messenger ----->
 
-    fun sendLoginExpired() = this.messenger.send(LoginExpiredMessage())
+    fun doLoginExpired() {
+        logout()
+        this.messenger.send(LoginExpiredMessage())
+    }
 
-    fun sendRefreshedUsedCoupon() = this.messenger.send(RefreshedUsedCouponMessage())
+    fun doRefreshedUsedCoupon() = this.messenger.send(RefreshedUsedCouponMessage())
 
     // endregion
 

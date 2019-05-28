@@ -63,6 +63,7 @@ class CouponFragment : BaseFragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
 
+        // setting binding
         this.binding = DataBindingUtil
                 .inflate<FragmentCouponBinding>(inflater, R.layout.fragment_coupon, container, false)
                 .owner(this)
@@ -80,9 +81,9 @@ class CouponFragment : BaseFragment() {
                 .subscribe({ itemViewModel -> useCouponConfirm(itemViewModel.toItemModel()) }, { }).addBug(this.subscriptions)
         this.adapter.addBug(this.subscriptions)
 
-        // setting view model
+        // setting view model message
         this.viewModel.onLoginExpired.observeOn(AndroidSchedulers.mainThread())
-                .subscribe(this::loginExpired) { }.addBug(this.subscriptions)
+                .subscribe(this::doLoginExpired) { }.addBug(this.subscriptions)
         this.viewModel.isRefreshing.replaceObserve(this, Observer {
             if (!it.unwrap && binding.swipeRefresh.isRefreshing) {
                 binding.swipeRefresh.isRefreshing = false

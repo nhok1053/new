@@ -47,15 +47,6 @@ class ProductListAdapter(viewModels: ObservableArrayList<ProductListItemViewMode
         }
     }
 
-    override fun dispose() {
-        if (!this.subscriptions.isDisposed)
-            this.subscriptions.dispose()
-    }
-
-    override fun isDisposed(): Boolean {
-        return this.subscriptions.isDisposed
-    }
-
     private fun setShowDetailCommand(viewModel: ProductListItemViewModel) {
         viewModel.onShowDetail.observeOn(AndroidSchedulers.mainThread())
                 .subscribe(this::itemClick) {}.addBug(this.subscriptions)

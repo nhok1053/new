@@ -8,7 +8,7 @@ import jp.co.pise.studyapp.framework.rx.LoginExpiredMessage
 import jp.co.pise.studyapp.presentation.StudyApp
 import jp.co.pise.studyapp.presentation.lifecycle.DisposableObserver
 
-abstract class BaseDialogFragment : DialogFragment(), Disposable {
+abstract class BaseDialogFragment : DialogFragment() {
     private val disableObserver = DisposableObserver()
     protected val subscriptions get() = this.disableObserver.subscriptions
 
@@ -17,27 +17,5 @@ abstract class BaseDialogFragment : DialogFragment(), Disposable {
         this.lifecycle.addObserver(this.disableObserver)
     }
 
-    override fun onAttach(context: Context?) {
-        super.onAttach(context)
-    }
-
-    override fun onDetach() {
-        super.onDetach()
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-    }
-
-    override fun dispose() {
-        this.subscriptions.dispose()
-    }
-
-    override fun isDisposed(): Boolean {
-        return this.subscriptions.isDisposed
-    }
-
-    protected fun loginExpired(message: LoginExpiredMessage) {
-        StudyApp.instance.sendLoginExpired()
-    }
+    protected fun doLoginExpired(message: LoginExpiredMessage) = StudyApp.instance.doLoginExpired()
 }

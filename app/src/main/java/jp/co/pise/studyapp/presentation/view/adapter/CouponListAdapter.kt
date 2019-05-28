@@ -8,7 +8,6 @@ import android.databinding.ObservableList
 import android.graphics.Paint
 import android.support.v7.widget.RecyclerView
 import android.text.TextUtils
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -43,15 +42,6 @@ class CouponListAdapter(viewModels: ObservableArrayList<CouponListItemViewModel>
         (positionStart until itemCount).forEach { index -> sender[index]?.let { vm -> this.setCommand(vm) } }
     }
 
-    override fun dispose() {
-        if (!this.subscriptions.isDisposed)
-            this.subscriptions.dispose()
-    }
-
-    override fun isDisposed(): Boolean {
-        return this.subscriptions.isDisposed
-    }
-
     fun useCoupon(model: GetCouponItemModel) {
         this.viewModels.firstOrNull { it.id == model.id }?.useCoupon()
     }
@@ -60,7 +50,7 @@ class CouponListAdapter(viewModels: ObservableArrayList<CouponListItemViewModel>
         viewModel.onUseCouponConfirm.observeOn(AndroidSchedulers.mainThread())
                 .subscribe(this::itemClick) {}.addBug(this.subscriptions)
         viewModel.onLoginExpired.observeOn(AndroidSchedulers.mainThread())
-                .subscribe(this::loginExpired) {}.addBug(this.subscriptions)
+                .subscribe(this::doLoginExpired) {}.addBug(this.subscriptions)
     }
 
     class ViewHolder(root: View, private val owner: LifecycleOwner) : RecyclerView.ViewHolder(root) {

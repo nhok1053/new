@@ -12,7 +12,5 @@ class DisposableObserver : LifecycleObserver {
     fun addAll(vararg disposable: Disposable) = subscriptions.addAll(*disposable)
 
     @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
-    fun onDestroyed() {
-        if (!this.subscriptions.isDisposed) this.subscriptions.dispose()
-    }
+    fun onDestroyed() = this.subscriptions.dispose()
 }

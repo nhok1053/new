@@ -19,6 +19,12 @@ import jp.co.pise.studyapp.presentation.viewmodel.BaseViewModel
 
 abstract class BaseAdapter<VM : BaseViewModel, VH : RecyclerView.ViewHolder>(protected val viewModels: ObservableArrayList<VM>, protected val owner: LifecycleOwner) : RecyclerView.Adapter<VH>(), Disposable  {
     private val onItemClickSubject: Subject<VM> = PublishSubject.create()
+
+    protected val subscriptions = CompositeDisposable()
+    protected val viewHolders: MutableList<VH> = mutableListOf()
+
+    val onItemClick: Observable<VM> = this.onItemClickSubject
+
     private val onListChangedCallback = object : ObservableList.OnListChangedCallback<ObservableList<VM>>() {
         override fun onChanged(sender: ObservableList<VM>) {
             onListItemChange(sender)
@@ -46,16 +52,14 @@ abstract class BaseAdapter<VM : BaseViewModel, VH : RecyclerView.ViewHolder>(pro
         }
     }
 
-    protected val subscriptions = CompositeDisposable()
-    protected val viewHolders: MutableList<VH> = mutableListOf()
-
-    val onItemClick: Observable<VM> = this.onItemClickSubject
-
     init {
         this.viewModels.addOnListChangedCallback(this.onListChangedCallback)
     }
 
-    protected fun loginExpired(message: LoginExpiredMessage) = StudyApp.instance.sendLoginExpired()
+    override fun isDisposed() = this.subscriptions.isDisposed
+    override fun dispose() = this.subscriptions.dispose()
+
+    protected fun doLoginExpired(message: LoginExpiredMessage) = StudyApp.instance.doLoginExpired()
     protected fun itemClick(viewModel: VM) = this.onItemClickSubject.onNext(viewModel)
 
     protected open fun onListItemChange(sender: ObservableList<VM>) {}

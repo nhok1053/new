@@ -18,6 +18,9 @@ import jp.co.pise.studyapp.presentation.viewmodel.adapter.CouponListItemViewMode
 import javax.inject.Inject
 
 class CouponFragmentViewModel @Inject constructor(userLogin: UserLogin, private val couponDisplay: CouponDisplay) : LoginOperationViewModel(userLogin) {
+    init {
+        this.couponDisplay.addBug(this.subscriptions)
+    }
 
     private var getCouponDisposable: Disposable? = null
 
