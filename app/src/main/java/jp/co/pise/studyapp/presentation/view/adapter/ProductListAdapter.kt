@@ -46,7 +46,7 @@ class ProductListAdapter(viewModels: ObservableArrayList<ProductListItemViewMode
 
     private fun setShowDetailCommand(viewModel: ProductListItemViewModel) {
         viewModel.onShowDetail.observeOn(AndroidSchedulers.mainThread())
-                .subscribe(this::itemClick) {}.addBug(this.subscriptions)
+                .subscribe(this::doItemClick) {}.addBug(this.subscriptions)
     }
 
     class ViewHolder(root: View, private val owner: LifecycleOwner) : RecyclerView.ViewHolder(root) {

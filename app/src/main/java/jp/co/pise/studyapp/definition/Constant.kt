@@ -22,6 +22,8 @@ object Message {
 
     const val REFRESH_USED_COUPON_SUCCESS = "クーポン利用情報をリセットしました。"
 
+    const val USE_COUPON_ERROR = "クーポンの利用処理に失敗しました。"
+
     fun getResultMessage(resultCode: ResultCode, defaultMessage: String?): String {
         return if (TextUtils.isEmpty(defaultMessage)) {
             when (resultCode) {

@@ -11,7 +11,10 @@ import android.text.TextUtils
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.subjects.PublishSubject
+import io.reactivex.subjects.Subject
 import jp.co.pise.studyapp.R
 import jp.co.pise.studyapp.domain.model.GetCouponItemModel
 import jp.co.pise.studyapp.extension.addBug
@@ -20,9 +23,13 @@ import jp.co.pise.studyapp.databinding.ItemCouponListBinding
 import jp.co.pise.studyapp.extension.owner
 import jp.co.pise.studyapp.extension.replaceObserve
 import jp.co.pise.studyapp.extension.resizeFromDimen
+import jp.co.pise.studyapp.presentation.StudyAppException
 
 class CouponListAdapter(viewModels: ObservableArrayList<CouponListItemViewModel>, owner: LifecycleOwner) : BaseAdapter<CouponListItemViewModel, CouponListAdapter.ViewHolder>(viewModels, owner) {
     init { this.viewModels.forEach { setCommand(it) } }
+
+    private val onUseCouponErrorSubject: Subject<StudyAppException> = PublishSubject.create()
+    val onUseCouponError: Observable<StudyAppException> = this.onUseCouponErrorSubject
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.item_coupon_list, parent, false)
@@ -48,9 +55,15 @@ class CouponListAdapter(viewModels: ObservableArrayList<CouponListItemViewModel>
 
     private fun setCommand(viewModel: CouponListItemViewModel) {
         viewModel.onUseCouponConfirm.observeOn(AndroidSchedulers.mainThread())
-                .subscribe(this::itemClick) {}.addBug(this.subscriptions)
+                .subscribe(this::doItemClick) {}.addBug(this.subscriptions)
         viewModel.onLoginExpired.observeOn(AndroidSchedulers.mainThread())
                 .subscribe(this::doLoginExpired) {}.addBug(this.subscriptions)
+        viewModel.onUseCouponError.observeOn(AndroidSchedulers.mainThread())
+                .subscribe(this::doUseCouponError) {}.addBug(this.subscriptions)
+    }
+
+    private fun doUseCouponError(ex: StudyAppException) {
+        this.onUseCouponErrorSubject.onNext(ex)
     }
 
     class ViewHolder(root: View, private val owner: LifecycleOwner) : RecyclerView.ViewHolder(root) {

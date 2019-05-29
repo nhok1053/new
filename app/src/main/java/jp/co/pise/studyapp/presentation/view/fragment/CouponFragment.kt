@@ -8,10 +8,12 @@ import android.support.v7.widget.LinearLayoutManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import dagger.android.support.AndroidSupportInjection
 import io.reactivex.android.schedulers.AndroidSchedulers
 import jp.co.pise.studyapp.R
 import jp.co.pise.studyapp.databinding.FragmentCouponBinding
+import jp.co.pise.studyapp.definition.Message
 import jp.co.pise.studyapp.domain.model.GetCouponItemModel
 import jp.co.pise.studyapp.domain.model.LoginUser
 import jp.co.pise.studyapp.extension.addBug
@@ -20,6 +22,7 @@ import jp.co.pise.studyapp.extension.replaceObserve
 import jp.co.pise.studyapp.extension.unwrap
 import jp.co.pise.studyapp.framework.rx.LoginStateChangeMessage
 import jp.co.pise.studyapp.presentation.StudyApp
+import jp.co.pise.studyapp.presentation.StudyAppException
 import jp.co.pise.studyapp.presentation.view.adapter.CouponListAdapter
 import jp.co.pise.studyapp.presentation.viewmodel.fragment.CouponFragmentViewModel
 import javax.inject.Inject
@@ -80,7 +83,9 @@ class CouponFragment : BaseFragment() {
         this.binding.recyclerView.layoutManager = LinearLayoutManager(context)
         this.binding.recyclerView.adapter = this.adapter
         this.adapter.onItemClick.observeOn(AndroidSchedulers.mainThread())
-                .subscribe({ itemViewModel -> useCouponConfirm(itemViewModel.toItemModel()) }, { }).addBug(this.subscriptions)
+                .subscribe({ itemViewModel -> doUseCouponConfirm(itemViewModel.toItemModel()) }, { }).addBug(this.subscriptions)
+        this.adapter.onUseCouponError.observeOn(AndroidSchedulers.mainThread())
+                .subscribe(this::doUseCouponError) {}.addBug(this.subscriptions)
         this.adapter.addBug(this.subscriptions)
 
         // setting view model message
@@ -119,8 +124,12 @@ class CouponFragment : BaseFragment() {
         }
     }
 
-    private fun useCouponConfirm(model: GetCouponItemModel) {
+    private fun doUseCouponConfirm(model: GetCouponItemModel) {
         this.useCouponConfirmListener?.onUsedCouponConfirm(model)
+    }
+
+    private fun doUseCouponError(ex: StudyAppException) {
+        Toast.makeText(context, Message.USE_COUPON_ERROR, Toast.LENGTH_SHORT).show()
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {

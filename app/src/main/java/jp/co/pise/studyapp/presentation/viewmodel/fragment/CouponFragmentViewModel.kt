@@ -66,7 +66,7 @@ class CouponFragmentViewModel @Inject constructor(userLogin: UserLogin, private 
             }
             action?.invoke()
 
-        }, { t -> checkLoginExpired(t, action) })
+        }, { t -> doLoginExpired(t, action) })
         this.getCouponDisposable?.addBug(this.subscriptions)
     }
 

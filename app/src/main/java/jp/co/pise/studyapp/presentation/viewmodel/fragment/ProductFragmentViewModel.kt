@@ -58,7 +58,7 @@ class ProductFragmentViewModel @Inject constructor(userLogin: UserLogin, private
                 productList.addAll(it)
             }
             action?.invoke()
-        }, { t -> checkLoginExpired(t, action) })
+        }, { t -> doLoginExpired(t, action) })
         this.getProductDisposable?.addBug(this.subscriptions)
     }
 }

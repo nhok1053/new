@@ -60,7 +60,7 @@ abstract class BaseAdapter<VM : BaseViewModel, VH : RecyclerView.ViewHolder>(pro
     override fun dispose() = this.subscriptions.dispose()
 
     protected fun doLoginExpired(message: LoginExpiredMessage) = StudyApp.instance.doLoginExpired()
-    protected fun itemClick(viewModel: VM) = this.onItemClickSubject.onNext(viewModel)
+    protected fun doItemClick(viewModel: VM) = this.onItemClickSubject.onNext(viewModel)
 
     protected open fun onListItemChange(sender: ObservableList<VM>) {}
     protected open fun onListItemRangeChanged(sender: ObservableList<VM>, positionStart: Int, itemCount: Int) {}

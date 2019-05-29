@@ -66,7 +66,7 @@ class NewsFragmentViewModel @Inject constructor(userLogin: UserLogin, private va
                 newsList.addAll(it)
             }
             action?.invoke()
-        }, { t -> checkLoginExpired(t, action) })
+        }, { t -> doLoginExpired(t, action) })
         this.getNewsDisposable?.addBug(this.subscriptions)
     }
 

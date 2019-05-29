@@ -100,8 +100,6 @@ class CouponUseFragment : BaseDialogFragment() {
 
             this.gestureDetector = GestureDetector(this.binding.parent.context, gestureListener)
             this.binding.parent.setOnTouchListener { _, motionEvent -> gestureDetector?.onTouchEvent(motionEvent) ?: true }
-
-            this.isCancelable = false
         }
 
         return this.binding.root

@@ -19,6 +19,7 @@ import jp.co.pise.studyapp.extension.default
 import jp.co.pise.studyapp.extension.map
 import jp.co.pise.studyapp.extension.unwrap
 import jp.co.pise.studyapp.presentation.StudyApp
+import jp.co.pise.studyapp.presentation.StudyAppException
 import jp.co.pise.studyapp.presentation.viewmodel.LoginOperationViewModel
 import java.util.*
 import javax.inject.Inject
@@ -98,9 +99,6 @@ class CouponListItemViewModel @Inject constructor(userLogin: UserLogin, private 
 
     val loginUser = MutableLiveData<LoginUser>()
 
-    private val onUseCouponConfirmSubject: Subject<CouponListItemViewModel> = PublishSubject.create()
-    val onUseCouponConfirm: Observable<CouponListItemViewModel> = this.onUseCouponConfirmSubject
-
     val useCouponTitle: LiveData<String> = this.isLogin.map {
         if (it) USE_COUPON_LOGIN_TITLE
         else USE_COUPON_NO_LOGIN_TITLE
@@ -123,6 +121,12 @@ class CouponListItemViewModel @Inject constructor(userLogin: UserLogin, private 
         addSource(_usedLimit) { this.value = getIsUseCouponLimit(_isLogin.value.unwrap, it.unwrap, _usedCount.value) }
         addSource(_usedCount) { this.value = getIsUseCouponLimit(_isLogin.value.unwrap, _usedLimit.value.unwrap, it) }
     }
+
+    private val onUseCouponConfirmSubject: Subject<CouponListItemViewModel> = PublishSubject.create()
+    val onUseCouponConfirm: Observable<CouponListItemViewModel> = this.onUseCouponConfirmSubject
+
+    private val onUseCouponErrorSubject: Subject<StudyAppException> = PublishSubject.create()
+    val onUseCouponError: Observable<StudyAppException> = this.onUseCouponErrorSubject
 
     // endregion
 
@@ -205,7 +209,12 @@ class CouponListItemViewModel @Inject constructor(userLogin: UserLogin, private 
             this.couponUse.useCoupon(model).observeOn(AndroidSchedulers.mainThread()).subscribe({ result ->
                 this._usedCount.postValue(result.usedCount)
                 this._isLoading.postValue(false)
-            }, { t -> checkLoginExpired(t) { this._isLoading.postValue(false) } }).addBug(this.subscriptions)
+            }, {
+                if (!doLoginExpired(it) { this._isLoading.postValue(false) }) {
+                    val ex = if (it is StudyAppException) it else StudyAppException.fromThrowable(it)
+                    this.onUseCouponErrorSubject.onNext(ex)
+                }
+            }).addBug(this.subscriptions)
         }
     }
 
