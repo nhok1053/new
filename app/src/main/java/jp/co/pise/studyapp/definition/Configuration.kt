@@ -22,15 +22,11 @@ object ApiConfig {
     const val X_API_DEVICE_VALUE = "Android"
 
     const val HEADER_AUTHORIZATION_KEY = "Authorization"
-    const val AUTHORIZATION_SCHEMA = "Bearer "
+    const val AUTHORIZATION_SCHEMA = "Bearer"
 
-    fun authorizationValue(accessToken: String): String? {
-        var result: String? = null
-        if (!TextUtils.isEmpty(accessToken)) {
-            result = AUTHORIZATION_SCHEMA + accessToken
-        }
-        return result
-    }
+    fun authorizationValue(accessToken: String) =
+            if (!TextUtils.isEmpty(accessToken)) "$AUTHORIZATION_SCHEMA $accessToken"
+            else null
 }
 
 object DbConfig {

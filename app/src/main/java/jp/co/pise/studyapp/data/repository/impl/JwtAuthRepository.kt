@@ -153,7 +153,7 @@ abstract class JwtAuthChallengeModel(
         @Transient val id: String,
         @Transient var accessToken: String) {
 
-    val authorizationValue: String?
+    val authorizationValue
         get() = ApiConfig.authorizationValue(this.accessToken)
 }
 
