@@ -48,7 +48,7 @@ abstract class BaseActivity : AppCompatActivity() {
     // region <----- protected method ----->
 
     protected fun doLoginExpired(message: LoginExpiredMessage) = StudyApp.instance.doLoginExpired()
-    protected fun onLoginExpired() {
+    open protected fun onLoginExpired() {
         Toast.makeText(this, jp.co.pise.studyapp.definition.Message.LOGIN_EXPIRED_ERROR, Toast.LENGTH_SHORT).show()
         val intent = LoginActivity.createIntent(this)
         startActivity(intent)

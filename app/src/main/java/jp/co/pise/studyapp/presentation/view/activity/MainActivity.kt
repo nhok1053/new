@@ -161,6 +161,11 @@ class MainActivity : BaseActivity(),
         settingDrawerMenu(message.isLogin, message.loginUser)
     }
 
+    override fun onLoginExpired() {
+        dismissDialogFragment()
+        super.onLoginExpired()
+    }
+
     private fun settingDrawerMenu() {
         settingDrawerMenu(StudyApp.instance.isLoggedIn, StudyApp.instance.loginUser)
     }
@@ -177,14 +182,17 @@ class MainActivity : BaseActivity(),
     }
 
     private fun replaceNewsFragment() {
+        dismissDialogFragment()
         replaceContainer(createNewsFragment(), NewsFragment.TAG, resources.getString(R.string.news_tab_title))
     }
 
     private fun replaceCouponFragment() {
+        dismissDialogFragment()
         replaceContainer(createCouponFragment(), CouponFragment.TAG, resources.getString(R.string.coupon_tab_title))
     }
 
     private fun replaceProductFragment() {
+        dismissDialogFragment()
         replaceContainer(createProductFragment(), ProductFragment.TAG, resources.getString(R.string.product_tab_title))
     }
 
@@ -210,16 +218,20 @@ class MainActivity : BaseActivity(),
         transaction.commit()
     }
 
+    private fun dismissDialogFragment() {
+        (supportFragmentManager.findFragmentByTag(CouponUseFragment.TAG) as CouponUseFragment?)?.dismiss()
+        (supportFragmentManager.findFragmentByTag(ProductDetailFragment.TAG) as ProductDetailFragment?)?.dismiss()
+    }
+
     // endregion
 
     // region <----- interface ----->
 
     override fun onUsedCouponConfirm(model: GetCouponItemModel) {
         // Fragmentの表示をシングルトンにする為、既に表示されていた場合は閉じる
-        var fragment = supportFragmentManager.findFragmentByTag(CouponUseFragment.TAG) as CouponUseFragment?
-        fragment?.dismiss()
+        (supportFragmentManager.findFragmentByTag(CouponUseFragment.TAG) as CouponUseFragment?)?.dismiss()
 
-        fragment = CouponUseFragment.newInstance(model)
+        val fragment = CouponUseFragment.newInstance(model)
         fragment.show(supportFragmentManager, CouponUseFragment.TAG)
     }
 
@@ -229,10 +241,9 @@ class MainActivity : BaseActivity(),
 
     override fun onShowProductDetail(model: ProductItemModel) {
         // Fragmentの表示をシングルトンにする為、既に表示されていた場合は閉じる
-        var fragment = supportFragmentManager.findFragmentByTag(ProductDetailFragment.TAG) as ProductDetailFragment?
-        fragment?.dismiss()
+        (supportFragmentManager.findFragmentByTag(ProductDetailFragment.TAG) as ProductDetailFragment?)?.dismiss()
 
-        fragment = ProductDetailFragment.newInstance(model)
+        val fragment = ProductDetailFragment.newInstance(model)
         fragment.show(supportFragmentManager, ProductDetailFragment.TAG)
     }
 
