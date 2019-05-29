@@ -2,12 +2,10 @@ package jp.co.pise.studyapp.presentation.view.adapter
 
 import android.arch.lifecycle.LifecycleOwner
 import android.arch.lifecycle.Observer
-import android.content.Context
 import android.databinding.DataBindingUtil
 import android.databinding.ObservableArrayList
 import android.support.v7.widget.RecyclerView
 import android.text.TextUtils
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -46,7 +44,7 @@ class NewsListAdapter(viewModels: ObservableArrayList<NewsListItemViewModel>, ow
             try {
                 if (!TextUtils.isEmpty(imageUrl)) {
                     this.binding.image.resizeFromDimen(
-                            imageUrl!!,
+                            imageUrl,
                             R.dimen.news_image_width,
                             R.dimen.news_image_height)
                     this.binding.image.visibility = View.VISIBLE

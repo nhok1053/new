@@ -199,17 +199,13 @@ class CouponListItemViewModel @Inject constructor(userLogin: UserLogin, private 
     }
 
     fun useCoupon() {
-        if (this.isLogin.value.unwrap) {
-            if (this.loginUser.value != null) {
-                this._isLoading.postValue(true)
-                val model = UseCouponChallenge(this._id, this.loginUser.value!!)
-                this.couponUse.useCoupon(model).observeOn(AndroidSchedulers.mainThread()).subscribe({ result ->
-                    this._usedCount.postValue(result.usedCount)
-                    this._isLoading.postValue(false)
-                }, { t -> checkLoginExpired(t) { this._isLoading.postValue(false) } }).addBug(this.subscriptions)
-            } else {
-                sendUserNotLoggedInMessage()
-            }
+        if (this.isLogin.value.unwrap && !this.isLoading.value.unwrap && this.loginUser.value != null) {
+            this._isLoading.postValue(true)
+            val model = UseCouponChallenge(this._id, this.loginUser.value!!)
+            this.couponUse.useCoupon(model).observeOn(AndroidSchedulers.mainThread()).subscribe({ result ->
+                this._usedCount.postValue(result.usedCount)
+                this._isLoading.postValue(false)
+            }, { t -> checkLoginExpired(t) { this._isLoading.postValue(false) } }).addBug(this.subscriptions)
         }
     }
 

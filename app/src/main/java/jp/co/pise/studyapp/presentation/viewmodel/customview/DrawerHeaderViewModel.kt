@@ -9,7 +9,7 @@ import jp.co.pise.studyapp.extension.unwrap
 import jp.co.pise.studyapp.presentation.viewmodel.BaseViewModel
 import javax.inject.Inject
 
-private val DEFAULT_HEADER_TEXT = "Guest User"
+private const val DEFAULT_HEADER_TEXT = "Guest User"
 
 class DrawerHeaderViewModel @Inject constructor() : BaseViewModel() {
 

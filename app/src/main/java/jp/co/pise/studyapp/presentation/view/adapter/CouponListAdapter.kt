@@ -73,7 +73,7 @@ class CouponListAdapter(viewModels: ObservableArrayList<CouponListItemViewModel>
             try {
                 if (!TextUtils.isEmpty(imageUrl)) {
                     this.binding.image.resizeFromDimen(
-                            imageUrl!!,
+                            imageUrl,
                             R.dimen.coupon_image_width,
                             R.dimen.coupon_image_height)
                     this.binding.image.visibility = View.VISIBLE

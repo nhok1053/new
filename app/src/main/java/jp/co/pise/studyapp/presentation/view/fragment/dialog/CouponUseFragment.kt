@@ -109,7 +109,7 @@ class CouponUseFragment : BaseDialogFragment() {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        dialog.window!!.setLayout(
+        dialog.window?.setLayout(
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.MATCH_PARENT)
     }
@@ -132,7 +132,7 @@ class CouponUseFragment : BaseDialogFragment() {
         try {
             if (!TextUtils.isEmpty(imageUrl)) {
                 this.binding.image.resizeFromDimen(
-                        imageUrl!!,
+                        imageUrl,
                         R.dimen.coupon_use_image_width,
                         R.dimen.coupon_use_image_height)
                 this.binding.image.visibility = View.VISIBLE

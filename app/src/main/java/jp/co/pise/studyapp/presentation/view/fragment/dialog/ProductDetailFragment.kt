@@ -21,7 +21,7 @@ import jp.co.pise.studyapp.extension.replaceObserve
 import jp.co.pise.studyapp.extension.resizeFromDimen
 import jp.co.pise.studyapp.presentation.viewmodel.fragment.dialog.ProductDetailFragmentViewModel
 
-private val PRODUCT = "product"
+private const val PRODUCT = "product"
 
 class ProductDetailFragment : BaseDialogFragment() {
     private var viewModel: ProductDetailFragmentViewModel? = null
@@ -101,7 +101,7 @@ class ProductDetailFragment : BaseDialogFragment() {
         try {
             if (!TextUtils.isEmpty(imageUrl)) {
                 this.binding.image.resizeFromDimen(
-                        imageUrl!!,
+                        imageUrl,
                         R.dimen.product_detail_image_width,
                         R.dimen.product_detail_image_height)
                 this.binding.image.visibility = View.VISIBLE

@@ -2,17 +2,14 @@ package jp.co.pise.studyapp.presentation.view.adapter
 
 import android.arch.lifecycle.LifecycleOwner
 import android.arch.lifecycle.Observer
-import android.content.Context
 import android.databinding.DataBindingUtil
 import android.databinding.ObservableArrayList
 import android.databinding.ObservableList
 import android.support.v7.widget.RecyclerView
 import android.text.TextUtils
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import jp.co.pise.studyapp.R
 import jp.co.pise.studyapp.databinding.ItemProductListBinding
@@ -65,7 +62,7 @@ class ProductListAdapter(viewModels: ObservableArrayList<ProductListItemViewMode
             try {
                 if (!TextUtils.isEmpty(imageUrl)) {
                     this.binding.image.resizeFromDimen(
-                            imageUrl!!,
+                            imageUrl,
                             R.dimen.product_image_width,
                             R.dimen.product_image_height)
                     this.binding.image.visibility = View.VISIBLE

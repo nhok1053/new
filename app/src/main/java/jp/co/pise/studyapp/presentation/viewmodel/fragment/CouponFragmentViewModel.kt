@@ -3,7 +3,6 @@ package jp.co.pise.studyapp.presentation.viewmodel.fragment
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MutableLiveData
 import android.databinding.ObservableArrayList
-import android.os.Handler
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import jp.co.pise.studyapp.domain.model.GetCouponChallenge
@@ -11,8 +10,6 @@ import jp.co.pise.studyapp.domain.model.LoginUser
 import jp.co.pise.studyapp.domain.usecase.CouponDisplay
 import jp.co.pise.studyapp.domain.usecase.UserLogin
 import jp.co.pise.studyapp.extension.addBug
-import jp.co.pise.studyapp.extension.default
-import jp.co.pise.studyapp.extension.unwrap
 import jp.co.pise.studyapp.presentation.viewmodel.LoginOperationViewModel
 import jp.co.pise.studyapp.presentation.viewmodel.adapter.CouponListItemViewModel
 import javax.inject.Inject

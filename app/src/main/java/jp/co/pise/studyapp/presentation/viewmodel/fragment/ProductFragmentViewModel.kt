@@ -3,7 +3,6 @@ package jp.co.pise.studyapp.presentation.viewmodel.fragment
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MutableLiveData
 import android.databinding.ObservableArrayList
-import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import jp.co.pise.studyapp.domain.usecase.ProductDisplay
@@ -11,7 +10,6 @@ import jp.co.pise.studyapp.domain.usecase.UserLogin
 import jp.co.pise.studyapp.extension.addBug
 import jp.co.pise.studyapp.extension.default
 import jp.co.pise.studyapp.presentation.viewmodel.LoginOperationViewModel
-import jp.co.pise.studyapp.presentation.viewmodel.adapter.NewsListItemViewModel
 import jp.co.pise.studyapp.presentation.viewmodel.adapter.ProductListItemViewModel
 import javax.inject.Inject
 

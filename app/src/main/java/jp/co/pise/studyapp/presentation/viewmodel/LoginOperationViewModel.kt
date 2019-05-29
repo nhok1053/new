@@ -6,7 +6,6 @@ import jp.co.pise.studyapp.definition.ResultCode
 import jp.co.pise.studyapp.domain.usecase.UserLogin
 import jp.co.pise.studyapp.extension.addBug
 import jp.co.pise.studyapp.framework.rx.LoginExpiredMessage
-import jp.co.pise.studyapp.framework.rx.UserNotLoggedInMessage
 import jp.co.pise.studyapp.presentation.StudyAppException
 
 abstract class LoginOperationViewModel(protected var userLogin: UserLogin) : BaseViewModel() {
@@ -15,7 +14,6 @@ abstract class LoginOperationViewModel(protected var userLogin: UserLogin) : Bas
     }
 
     val onLoginExpired: Observable<LoginExpiredMessage> = this.messenger.register(LoginExpiredMessage::class.java)
-    val onUserNotLoggedIn: Observable<UserNotLoggedInMessage> = this.messenger.register(UserNotLoggedInMessage::class.java)
 
     protected fun checkLoginExpired(throwable: Throwable, action: (() -> Unit)? = null) {
         try {
@@ -42,9 +40,5 @@ abstract class LoginOperationViewModel(protected var userLogin: UserLogin) : Bas
 
     protected fun sendLoginExpiredMessage() {
         this.messenger.send(LoginExpiredMessage())
-    }
-
-    protected fun sendUserNotLoggedInMessage() {
-        this.messenger.send(UserNotLoggedInMessage())
     }
 }
