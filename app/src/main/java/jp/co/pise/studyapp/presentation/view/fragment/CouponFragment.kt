@@ -13,10 +13,12 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import jp.co.pise.studyapp.R
 import jp.co.pise.studyapp.databinding.FragmentCouponBinding
 import jp.co.pise.studyapp.domain.model.GetCouponItemModel
+import jp.co.pise.studyapp.domain.model.LoginUser
 import jp.co.pise.studyapp.extension.addBug
 import jp.co.pise.studyapp.extension.owner
 import jp.co.pise.studyapp.extension.replaceObserve
 import jp.co.pise.studyapp.extension.unwrap
+import jp.co.pise.studyapp.framework.rx.LoginStateChangeMessage
 import jp.co.pise.studyapp.presentation.StudyApp
 import jp.co.pise.studyapp.presentation.view.adapter.CouponListAdapter
 import jp.co.pise.studyapp.presentation.viewmodel.fragment.CouponFragmentViewModel
@@ -92,7 +94,7 @@ class CouponFragment : BaseFragment() {
 
         // setting app message
         StudyApp.instance.onLoginStateChange
-                .subscribe({ initViewModel() }, { }).addBug(this.subscriptions)
+                .subscribe(this::onLoginStateChanged) { }.addBug(this.subscriptions)
         StudyApp.instance.onRefreshedUsedCoupon
                 .subscribe({ initViewModel() }, { }).addBug(this.subscriptions)
 
@@ -101,9 +103,17 @@ class CouponFragment : BaseFragment() {
         return this.binding.root
     }
 
+    private fun onLoginStateChanged(message: LoginStateChangeMessage) {
+        initViewModel(message.isLogin, message.loginUser)
+    }
+
     private fun initViewModel() {
-        if (StudyApp.instance.isLoggedIn && StudyApp.instance.loginUser != null) {
-            this.viewModel.initialize(true, StudyApp.instance.loginUser)
+        initViewModel(StudyApp.instance.isLoggedIn, StudyApp.instance.loginUser)
+    }
+
+    private fun initViewModel(isLogin: Boolean, loginUser: LoginUser?) {
+        if (isLogin && loginUser != null) {
+            this.viewModel.initialize(true, loginUser)
         } else {
             this.viewModel.initialize(false, null)
         }

@@ -19,9 +19,11 @@ import jp.co.pise.studyapp.R
 import jp.co.pise.studyapp.databinding.ActivityMainBinding
 import jp.co.pise.studyapp.definition.Message
 import jp.co.pise.studyapp.domain.model.GetCouponItemModel
+import jp.co.pise.studyapp.domain.model.LoginUser
 import jp.co.pise.studyapp.domain.model.ProductItemModel
 import jp.co.pise.studyapp.extension.addBug
 import jp.co.pise.studyapp.extension.owner
+import jp.co.pise.studyapp.framework.rx.LoginStateChangeMessage
 import jp.co.pise.studyapp.presentation.StudyApp
 import jp.co.pise.studyapp.presentation.view.customview.DrawerHeaderView
 import jp.co.pise.studyapp.presentation.view.fragment.CouponFragment
@@ -75,7 +77,7 @@ class MainActivity : BaseActivity(),
 
         // setting app message
         StudyApp.instance.onLoginStateChange.observeOn(AndroidSchedulers.mainThread())
-                .subscribe({ onLoginStateChanged() }, { }).addBug(this.subscriptions)
+                .subscribe(this::onLoginStateChanged) { }.addBug(this.subscriptions)
         StudyApp.instance.onLoginExpired.observeOn(AndroidSchedulers.mainThread())
                 .subscribe({ onLoginExpired() }, { }).addBug(this.subscriptions)
 
@@ -88,7 +90,6 @@ class MainActivity : BaseActivity(),
         }
         this.drawerHeaderView = DrawerHeaderView(this, this)
         this.binding.navigationView.addHeaderView(this.drawerHeaderView)
-        settingDrawerHeader()
         settingDrawerMenu()
         this.drawerHeaderView.addBug(this.subscriptions)
 
@@ -156,27 +157,22 @@ class MainActivity : BaseActivity(),
         }
     }
 
-    private fun onLoginStateChanged() {
-        settingDrawerHeader()
-        settingDrawerMenu()
-    }
-
-    private fun settingDrawerHeader() {
-        if (StudyApp.instance.isLoggedIn && StudyApp.instance.loginUser != null) {
-            this.drawerHeaderView.setLogin(true, StudyApp.instance.loginUser)
-        } else {
-            this.drawerHeaderView.setLogin(false, null)
-        }
+    private fun onLoginStateChanged(message: LoginStateChangeMessage) {
+        settingDrawerMenu(message.isLogin, message.loginUser)
     }
 
     private fun settingDrawerMenu() {
+        settingDrawerMenu(StudyApp.instance.isLoggedIn, StudyApp.instance.loginUser)
+    }
+
+    private fun settingDrawerMenu(isLogin: Boolean, loginUser: LoginUser?) {
         if (this.binding.navigationView.menu != null)
             this.binding.navigationView.menu.clear()
 
-        if (StudyApp.instance.isLoggedIn) {
-            this.binding.navigationView.inflateMenu(R.menu.signin_drawer_item)
+        if (isLogin && loginUser != null) {
+            this.binding.navigationView.inflateMenu(R.menu.login_drawer_item)
         } else {
-            this.binding.navigationView.inflateMenu(R.menu.not_signin_drawer_item)
+            this.binding.navigationView.inflateMenu(R.menu.not_login_drawer_item)
         }
     }
 

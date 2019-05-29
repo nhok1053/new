@@ -15,7 +15,7 @@ import jp.co.pise.studyapp.framework.dagger.DaggerAppComponent
 import jp.co.pise.studyapp.framework.rx.LoginExpiredMessage
 import jp.co.pise.studyapp.framework.rx.Messenger
 import jp.co.pise.studyapp.framework.rx.RefreshedUsedCouponMessage
-import jp.co.pise.studyapp.framework.rx.UserLoginStateChangeMessage
+import jp.co.pise.studyapp.framework.rx.LoginStateChangeMessage
 import javax.inject.Inject
 
 class StudyApp : Application(), HasActivityInjector, HasSupportFragmentInjector {
@@ -37,7 +37,7 @@ class StudyApp : Application(), HasActivityInjector, HasSupportFragmentInjector 
     val isLoggedIn get() = this.loginUser != null
 
     val onLoginStateChange
-            = this.messenger.register(UserLoginStateChangeMessage::class.java)
+            = this.messenger.register(LoginStateChangeMessage::class.java)
     val onLoginExpired
             = this.messenger.register(LoginExpiredMessage::class.java)
     val onRefreshedUsedCoupon
@@ -85,14 +85,14 @@ class StudyApp : Application(), HasActivityInjector, HasSupportFragmentInjector 
     fun login(loginUser: LoginUser) {
         if (this.loginUser?.loginId != loginUser.loginId) {
             this.loginUser = loginUser
-            this.messenger.send(UserLoginStateChangeMessage(true))
+            this.messenger.send(LoginStateChangeMessage(true, loginUser))
         }
     }
 
     fun logout() {
         if (this.loginUser != null) {
             this.loginUser = null
-            this.messenger.send(UserLoginStateChangeMessage(false))
+            this.messenger.send(LoginStateChangeMessage(false, null))
         }
     }
 

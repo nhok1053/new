@@ -32,7 +32,7 @@ class DrawerHeaderViewModel @Inject constructor() : BaseViewModel() {
         else DEFAULT_HEADER_TEXT
     }
 
-    fun setLogin(isLogin: Boolean, loginUser: LoginUser?) {
+    fun setLoginState(isLogin: Boolean, loginUser: LoginUser?) {
         if (isLogin && loginUser != null) {
             this._isLogin.postValue(true)
             this._loginUser.postValue(loginUser)
