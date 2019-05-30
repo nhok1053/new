@@ -2,6 +2,7 @@ package jp.co.pise.studyapp.presentation.view.fragment
 
 import android.arch.lifecycle.Observer
 import android.content.Context
+import android.content.Intent
 import android.databinding.DataBindingUtil
 import android.os.Bundle
 import android.support.v7.widget.LinearLayoutManager
@@ -24,19 +25,17 @@ import jp.co.pise.studyapp.framework.rx.LoginStateChangeMessage
 import jp.co.pise.studyapp.presentation.StudyApp
 import jp.co.pise.studyapp.presentation.StudyAppException
 import jp.co.pise.studyapp.presentation.view.adapter.CouponListAdapter
+import jp.co.pise.studyapp.presentation.view.fragment.dialog.CouponUseFragment
 import jp.co.pise.studyapp.presentation.viewmodel.fragment.CouponFragmentViewModel
 import javax.inject.Inject
 
-class CouponFragment : BaseFragment() {
+const val USE_COUPON_REQUEST_CODE = 0
+
+class CouponFragment : BaseFragment(), CouponUseFragment.UseCouponListener {
     @Inject
     lateinit var viewModel: CouponFragmentViewModel
     private lateinit var binding: FragmentCouponBinding
     private lateinit var adapter: CouponListAdapter
-    private var useCouponConfirmListener: UseCouponConfirmListener? = null
-
-    interface UseCouponConfirmListener {
-        fun onUsedCouponConfirm(model: GetCouponItemModel)
-    }
 
     companion object {
         const val TAG = "CouponFragment"
@@ -46,19 +45,9 @@ class CouponFragment : BaseFragment() {
         }
     }
 
-    fun useCoupon(model: GetCouponItemModel) {
-        this.adapter.useCoupon(model)
-    }
-
     override fun onAttach(context: Context?) {
         AndroidSupportInjection.inject(this)
         super.onAttach(context)
-
-        if (context is UseCouponConfirmListener) {
-            this.useCouponConfirmListener = context
-        } else {
-            this.useCouponConfirmListener = null
-        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -112,6 +101,10 @@ class CouponFragment : BaseFragment() {
         initViewModel(message.isLogin, message.loginUser)
     }
 
+    override fun onUseCoupon(model: GetCouponItemModel) {
+        this.adapter.useCoupon(model)
+    }
+
     private fun initViewModel() {
         initViewModel(StudyApp.instance.isLoggedIn, StudyApp.instance.loginUser)
     }
@@ -125,7 +118,12 @@ class CouponFragment : BaseFragment() {
     }
 
     private fun doUseCouponConfirm(model: GetCouponItemModel) {
-        this.useCouponConfirmListener?.onUsedCouponConfirm(model)
+        // Fragmentの表示をシングルトンにする為、既に表示されていた場合は閉じる
+        (fragmentManager?.findFragmentByTag(CouponUseFragment.TAG) as CouponUseFragment?)?.dismiss()
+
+        val fragment = CouponUseFragment.newInstance(model)
+        fragment.setTargetFragment(this, USE_COUPON_REQUEST_CODE)
+        fragment.show(fragmentManager, CouponUseFragment.TAG)
     }
 
     private fun doUseCouponError(ex: StudyAppException) {
@@ -142,5 +140,9 @@ class CouponFragment : BaseFragment() {
 
     override fun onPause() {
         super.onPause()
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
     }
 }

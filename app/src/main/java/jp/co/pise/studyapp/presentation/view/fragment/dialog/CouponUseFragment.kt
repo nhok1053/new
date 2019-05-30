@@ -54,10 +54,10 @@ class CouponUseFragment : BaseDialogFragment() {
     override fun onAttach(context: Context?) {
         super.onAttach(context)
 
-        if (context is UseCouponListener) {
-            this.useCouponListener = context
-        } else {
-            this.useCouponListener = null
+        this.useCouponListener = when {
+            context is UseCouponListener -> context
+            targetFragment is UseCouponListener -> targetFragment as UseCouponListener
+            else -> null
         }
     }
 

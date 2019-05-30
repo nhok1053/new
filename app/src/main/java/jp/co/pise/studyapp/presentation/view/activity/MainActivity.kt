@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.databinding.DataBindingUtil
 import android.os.Bundle
+import android.support.v4.app.DialogFragment
 import android.support.v4.app.Fragment
 import android.support.v4.content.ContextCompat
 import android.support.v4.view.GravityCompat
@@ -18,9 +19,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import jp.co.pise.studyapp.R
 import jp.co.pise.studyapp.databinding.ActivityMainBinding
 import jp.co.pise.studyapp.definition.Message
-import jp.co.pise.studyapp.domain.model.GetCouponItemModel
 import jp.co.pise.studyapp.domain.model.LoginUser
-import jp.co.pise.studyapp.domain.model.ProductItemModel
 import jp.co.pise.studyapp.extension.addBug
 import jp.co.pise.studyapp.extension.owner
 import jp.co.pise.studyapp.framework.rx.LoginStateChangeMessage
@@ -29,16 +28,10 @@ import jp.co.pise.studyapp.presentation.view.customview.DrawerHeaderView
 import jp.co.pise.studyapp.presentation.view.fragment.CouponFragment
 import jp.co.pise.studyapp.presentation.view.fragment.NewsFragment
 import jp.co.pise.studyapp.presentation.view.fragment.ProductFragment
-import jp.co.pise.studyapp.presentation.view.fragment.dialog.CouponUseFragment
-import jp.co.pise.studyapp.presentation.view.fragment.dialog.ProductDetailFragment
 import jp.co.pise.studyapp.presentation.viewmodel.activity.MainActivityViewModel
 import javax.inject.Inject
 
-class MainActivity : BaseActivity(),
-        HasSupportFragmentInjector,
-        CouponFragment.UseCouponConfirmListener,
-        CouponUseFragment.UseCouponListener,
-        ProductFragment.ShowProductDetailListener {
+class MainActivity : BaseActivity(), HasSupportFragmentInjector {
 
     @Inject
     lateinit var fragmentInjector: DispatchingAndroidInjector<Fragment>
@@ -219,33 +212,12 @@ class MainActivity : BaseActivity(),
     }
 
     private fun dismissDialogFragment() {
-        (supportFragmentManager.findFragmentByTag(CouponUseFragment.TAG) as CouponUseFragment?)?.dismiss()
-        (supportFragmentManager.findFragmentByTag(ProductDetailFragment.TAG) as ProductDetailFragment?)?.dismiss()
+        supportFragmentManager.fragments.forEach { if (it is DialogFragment) it.dismiss() }
     }
 
     // endregion
 
     // region <----- interface ----->
-
-    override fun onUsedCouponConfirm(model: GetCouponItemModel) {
-        // Fragmentの表示をシングルトンにする為、既に表示されていた場合は閉じる
-        (supportFragmentManager.findFragmentByTag(CouponUseFragment.TAG) as CouponUseFragment?)?.dismiss()
-
-        val fragment = CouponUseFragment.newInstance(model)
-        fragment.show(supportFragmentManager, CouponUseFragment.TAG)
-    }
-
-    override fun onUseCoupon(model: GetCouponItemModel) {
-        (supportFragmentManager.findFragmentByTag(CouponFragment.TAG) as CouponFragment?)?.useCoupon(model)
-    }
-
-    override fun onShowProductDetail(model: ProductItemModel) {
-        // Fragmentの表示をシングルトンにする為、既に表示されていた場合は閉じる
-        (supportFragmentManager.findFragmentByTag(ProductDetailFragment.TAG) as ProductDetailFragment?)?.dismiss()
-
-        val fragment = ProductDetailFragment.newInstance(model)
-        fragment.show(supportFragmentManager, ProductDetailFragment.TAG)
-    }
 
     override fun supportFragmentInjector(): AndroidInjector<Fragment>? {
         return this.fragmentInjector

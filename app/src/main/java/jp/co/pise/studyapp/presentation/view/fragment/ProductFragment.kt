@@ -18,6 +18,7 @@ import jp.co.pise.studyapp.extension.owner
 import jp.co.pise.studyapp.extension.replaceObserve
 import jp.co.pise.studyapp.extension.unwrap
 import jp.co.pise.studyapp.presentation.view.adapter.ProductListAdapter
+import jp.co.pise.studyapp.presentation.view.fragment.dialog.ProductDetailFragment
 import jp.co.pise.studyapp.presentation.viewmodel.fragment.ProductFragmentViewModel
 import javax.inject.Inject
 
@@ -28,11 +29,6 @@ class ProductFragment : BaseFragment() {
     lateinit var viewModel: ProductFragmentViewModel
     private lateinit var binding: FragmentProductBinding
     private lateinit var adapter: ProductListAdapter
-    private var showProductDetailListener: ShowProductDetailListener? = null
-
-    interface ShowProductDetailListener {
-        fun onShowProductDetail(model: ProductItemModel)
-    }
 
     companion object {
         const val TAG = "ProductFragment"
@@ -45,12 +41,6 @@ class ProductFragment : BaseFragment() {
     override fun onAttach(context: Context?) {
         AndroidSupportInjection.inject(this)
         super.onAttach(context)
-
-        if (context is ShowProductDetailListener) {
-            this.showProductDetailListener = context
-        } else {
-            this.showProductDetailListener = null
-        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -93,7 +83,11 @@ class ProductFragment : BaseFragment() {
     }
 
     private fun showProductDetail(model: ProductItemModel) {
-        this.showProductDetailListener?.onShowProductDetail(model)
+        // Fragmentの表示をシングルトンにする為、既に表示されていた場合は閉じる
+        (fragmentManager?.findFragmentByTag(ProductDetailFragment.TAG) as ProductDetailFragment?)?.dismiss()
+
+        val fragment = ProductDetailFragment.newInstance(model)
+        fragment.show(fragmentManager, ProductDetailFragment.TAG)
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
