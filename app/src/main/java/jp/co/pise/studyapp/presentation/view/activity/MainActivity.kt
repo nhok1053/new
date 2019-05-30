@@ -25,6 +25,7 @@ import jp.co.pise.studyapp.extension.owner
 import jp.co.pise.studyapp.framework.rx.LoginStateChangeMessage
 import jp.co.pise.studyapp.presentation.StudyApp
 import jp.co.pise.studyapp.presentation.view.customview.DrawerHeaderView
+import jp.co.pise.studyapp.presentation.view.fragment.BaseFragment
 import jp.co.pise.studyapp.presentation.view.fragment.CouponFragment
 import jp.co.pise.studyapp.presentation.view.fragment.NewsFragment
 import jp.co.pise.studyapp.presentation.view.fragment.ProductFragment
@@ -124,16 +125,23 @@ class MainActivity : BaseActivity(), HasSupportFragmentInjector {
         // setting bottom navigation
         this.binding.bottomNavigation.setOnNavigationItemSelectedListener { menuItem ->
             when (menuItem.itemId) {
-                R.id.nav_news -> replaceNewsFragment()
-                R.id.nav_coupon -> replaceCouponFragment()
-                R.id.nav_product -> replaceProductFragment()
+                R.id.nav_news -> showNewsFragment()
+                R.id.nav_coupon -> showCouponFragment()
+                R.id.nav_product -> showProductFragment()
             }
             true
         }
 
-        // 再生成でない場合のみ初期選択にする
-        if (savedInstanceState == null)
-            replaceNewsFragment()
+        // 再生成でない場合のみ初期設定する
+        if (savedInstanceState == null) {
+            this.supportFragmentManager.beginTransaction()
+                    .add(R.id.container, createNewsFragment(), NewsFragment.TAG)
+                    .add(R.id.container, createCouponFragment(), CouponFragment.TAG)
+                    .add(R.id.container, createProductFragment(), ProductFragment.TAG)
+                    .commitNow()
+
+            showNewsFragment()
+        }
     }
 
     // region <----- private method ----->
@@ -174,19 +182,29 @@ class MainActivity : BaseActivity(), HasSupportFragmentInjector {
         }
     }
 
-    private fun replaceNewsFragment() {
+    private fun showNewsFragment() {
         dismissDialogFragment()
-        replaceContainer(createNewsFragment(), NewsFragment.TAG, resources.getString(R.string.news_tab_title))
+        showFragment<NewsFragment>()
     }
 
-    private fun replaceCouponFragment() {
+    private fun showCouponFragment() {
         dismissDialogFragment()
-        replaceContainer(createCouponFragment(), CouponFragment.TAG, resources.getString(R.string.coupon_tab_title))
+        showFragment<CouponFragment>()
     }
 
-    private fun replaceProductFragment() {
+    private fun showProductFragment() {
         dismissDialogFragment()
-        replaceContainer(createProductFragment(), ProductFragment.TAG, resources.getString(R.string.product_tab_title))
+        showFragment<ProductFragment>()
+    }
+
+    private inline fun <reified T : BaseFragment> showFragment() {
+        this.supportFragmentManager.beginTransaction().apply {
+            supportFragmentManager.fragments.forEach {
+                if (it is T) show(it)
+                else hide(it)
+            }
+            commit()
+        }
     }
 
     private fun createNewsFragment(): NewsFragment {
@@ -199,16 +217,6 @@ class MainActivity : BaseActivity(), HasSupportFragmentInjector {
 
     private fun createProductFragment(): ProductFragment {
         return ProductFragment.newInstance()
-    }
-
-    private fun replaceContainer(fragment: Fragment, tag: String, title: String) {
-        if (supportActionBar != null)
-            supportActionBar!!.title = title
-
-        val fragmentManager = supportFragmentManager
-        val transaction = fragmentManager.beginTransaction()
-        transaction.replace(R.id.container, fragment, tag)
-        transaction.commit()
     }
 
     private fun dismissDialogFragment() {
