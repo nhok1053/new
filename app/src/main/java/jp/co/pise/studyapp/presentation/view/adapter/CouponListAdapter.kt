@@ -42,7 +42,8 @@ class CouponListAdapter(viewModels: ObservableArrayList<CouponListItemViewModel>
 
     override fun onListItemRangeInserted(sender: ObservableList<CouponListItemViewModel>, positionStart: Int, itemCount: Int) {
         super.onListItemRangeInserted(sender, positionStart, itemCount)
-        (positionStart until itemCount).forEach { index -> sender[index]?.let { vm -> this.setCommand(vm) } }
+        (positionStart until itemCount).forEach { index ->
+            if (index < sender.size) sender[index]?.let { vm -> this.setCommand(vm) } }
     }
 
     fun useCoupon(model: GetCouponItemModel) {

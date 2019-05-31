@@ -21,7 +21,7 @@ import jp.co.pise.studyapp.presentation.viewmodel.adapter.NewsListItemViewModel
 
 class NewsListAdapter(viewModels: ObservableArrayList<NewsListItemViewModel>, owner: LifecycleOwner) : BaseAdapter<NewsListItemViewModel, NewsListAdapter.ViewHolder>(viewModels, owner) {
     init {
-        this.viewModels.forEach { this.setShowDetailCommand(it) }
+        this.viewModels.forEach { this.setCommand(it) }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -36,11 +36,10 @@ class NewsListAdapter(viewModels: ObservableArrayList<NewsListItemViewModel>, ow
     override fun onListItemRangeInserted(sender: ObservableList<NewsListItemViewModel>, positionStart: Int, itemCount: Int) {
         super.onListItemRangeInserted(sender, positionStart, itemCount)
         (positionStart until itemCount).forEach { index ->
-            if (index < sender.size) sender[index]?.let { setShowDetailCommand(it) }
-        }
+            if (index < sender.size) sender[index]?.let { vm -> this.setCommand(vm) } }
     }
 
-    private fun setShowDetailCommand(viewModel: NewsListItemViewModel) {
+    private fun setCommand(viewModel: NewsListItemViewModel) {
         viewModel.onShowDetail.observeOn(AndroidSchedulers.mainThread())
                 .subscribe(this::doItemClick) { }.addBug(this.subscriptions)
     }

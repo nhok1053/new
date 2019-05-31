@@ -21,7 +21,7 @@ import jp.co.pise.studyapp.presentation.viewmodel.adapter.ProductListItemViewMod
 
 class ProductListAdapter(viewModels: ObservableArrayList<ProductListItemViewModel>, owner: LifecycleOwner) : BaseAdapter<ProductListItemViewModel, ProductListAdapter.ViewHolder>(viewModels, owner) {
     init {
-        this.viewModels.forEach { this.setShowDetailCommand(it) }
+        this.viewModels.forEach { this.setCommand(it) }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -36,11 +36,10 @@ class ProductListAdapter(viewModels: ObservableArrayList<ProductListItemViewMode
     override fun onListItemRangeInserted(sender: ObservableList<ProductListItemViewModel>, positionStart: Int, itemCount: Int) {
         super.onListItemRangeInserted(sender, positionStart, itemCount)
         (positionStart until itemCount).forEach { index ->
-            if (index < sender.size) sender[index]?.let { setShowDetailCommand(it) }
-        }
+            if (index < sender.size) sender[index]?.let { vm -> this.setCommand(vm) } }
     }
 
-    private fun setShowDetailCommand(viewModel: ProductListItemViewModel) {
+    private fun setCommand(viewModel: ProductListItemViewModel) {
         viewModel.onShowDetail.observeOn(AndroidSchedulers.mainThread())
                 .subscribe(this::doItemClick) {}.addBug(this.subscriptions)
     }
