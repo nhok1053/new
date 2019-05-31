@@ -1,4 +1,4 @@
-package jp.co.pise.studyapp.presentation.view.fragment
+package jp.co.pise.studyapp.presentation.view.fragment.child
 
 import android.arch.lifecycle.Observer
 import android.content.Context
@@ -25,8 +25,9 @@ import jp.co.pise.studyapp.framework.rx.LoginStateChangeMessage
 import jp.co.pise.studyapp.presentation.StudyApp
 import jp.co.pise.studyapp.presentation.StudyAppException
 import jp.co.pise.studyapp.presentation.view.adapter.CouponListAdapter
+import jp.co.pise.studyapp.presentation.view.fragment.BaseFragment
 import jp.co.pise.studyapp.presentation.view.fragment.dialog.CouponUseFragment
-import jp.co.pise.studyapp.presentation.viewmodel.fragment.CouponFragmentViewModel
+import jp.co.pise.studyapp.presentation.viewmodel.fragment.child.CouponFragmentViewModel
 import javax.inject.Inject
 
 const val USE_COUPON_REQUEST_CODE = 0

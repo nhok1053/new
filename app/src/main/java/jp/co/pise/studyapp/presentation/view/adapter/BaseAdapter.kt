@@ -1,28 +1,21 @@
 package jp.co.pise.studyapp.presentation.view.adapter
 
 import android.arch.lifecycle.LifecycleOwner
-import android.databinding.DataBindingUtil
 import android.databinding.ObservableArrayList
 import android.databinding.ObservableList
-import android.databinding.ViewDataBinding
 import android.support.v7.widget.RecyclerView
-import android.view.View
 import io.reactivex.Observable
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 import io.reactivex.subjects.PublishSubject
 import io.reactivex.subjects.Subject
-import jp.co.pise.studyapp.extension.owner
 import jp.co.pise.studyapp.framework.rx.LoginExpiredMessage
 import jp.co.pise.studyapp.presentation.StudyApp
 import jp.co.pise.studyapp.presentation.viewmodel.BaseViewModel
 
 abstract class BaseAdapter<VM : BaseViewModel, VH : RecyclerView.ViewHolder>(protected val viewModels: ObservableArrayList<VM>, protected val owner: LifecycleOwner) : RecyclerView.Adapter<VH>(), Disposable  {
     private val onItemClickSubject: Subject<VM> = PublishSubject.create()
-
     protected val subscriptions = CompositeDisposable()
-    protected val viewHolders: MutableList<VH> = mutableListOf()
-
     val onItemClick: Observable<VM> = this.onItemClickSubject
 
     private val onListChangedCallback = object : ObservableList.OnListChangedCallback<ObservableList<VM>>() {
@@ -58,6 +51,7 @@ abstract class BaseAdapter<VM : BaseViewModel, VH : RecyclerView.ViewHolder>(pro
 
     override fun isDisposed() = this.subscriptions.isDisposed
     override fun dispose() = this.subscriptions.dispose()
+    override fun getItemCount() = this.viewModels.size
 
     protected fun doLoginExpired(message: LoginExpiredMessage) = StudyApp.instance.doLoginExpired()
     protected fun doItemClick(viewModel: VM) = this.onItemClickSubject.onNext(viewModel)

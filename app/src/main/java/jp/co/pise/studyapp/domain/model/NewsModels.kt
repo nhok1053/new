@@ -2,6 +2,7 @@ package jp.co.pise.studyapp.domain.model
 
 import io.reactivex.annotations.NonNull
 import jp.co.pise.studyapp.data.entity.News
+import java.io.Serializable
 
 class GetNewsResult(val news: List<GetNewsItemModel>? = null) : ProcessResultModel()
 
@@ -9,7 +10,7 @@ class GetNewsItemModel(val id: String,
                        val imageUrl: String?,
                        val description: String?,
                        val url: String?,
-                       val sortOrder: Int) {
+                       val sortOrder: Int) : Serializable {
 
     fun toEntity(): News {
         return News(this.id, this.imageUrl, this.description, this.url, this.sortOrder)

@@ -20,6 +20,9 @@
     <dimen name="news_image_width">200dp</dimen>
     <dimen name="news_image_height">200dp</dimen>
 
+    <dimen name="news_detail_image_width">200dp</dimen>
+    <dimen name="news_detail_image_height">200dp</dimen>
+
     <dimen name="product_image_width">80dp</dimen>
     <dimen name="product_image_height">80dp</dimen>
 

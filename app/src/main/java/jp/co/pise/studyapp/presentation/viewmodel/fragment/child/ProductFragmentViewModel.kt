@@ -1,4 +1,4 @@
-package jp.co.pise.studyapp.presentation.viewmodel.fragment
+package jp.co.pise.studyapp.presentation.viewmodel.fragment.child
 
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MutableLiveData
@@ -58,7 +58,10 @@ class ProductFragmentViewModel @Inject constructor(userLogin: UserLogin, private
                 productList.addAll(it)
             }
             action?.invoke()
-        }, { t -> doLoginExpired(t, action) })
+        }, { t ->
+            if(!doLoginExpired(t, action))
+                action?.invoke()
+        })
         this.getProductDisposable?.addBug(this.subscriptions)
     }
 }

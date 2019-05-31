@@ -63,20 +63,10 @@ class CouponUseFragment : BaseDialogFragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        if (arguments != null) {
-            val coupon = arguments!!.getSerializable(COUPON) as GetCouponItemModel?
-            if (coupon != null) {
-                this.viewModel = CouponUseFragmentViewModel.fromResultItem(coupon)
-                this.viewModel!!.onClose.observeOn(AndroidSchedulers.mainThread())
-                        .subscribe({ dismiss() }, { }).addBug(this.subscriptions)
-            } else {
-                this.viewModel?.dispose()
-                this.viewModel = null
-            }
-        } else {
-            this.viewModel?.dispose()
-            this.viewModel = null
-        }
+
+        this.viewModel?.dispose()
+        this.viewModel = (arguments?.getSerializable(COUPON) as GetCouponItemModel?)
+                ?.let { model -> CouponUseFragmentViewModel.fromResultItem(model) }
     }
 
     @SuppressLint("ClickableViewAccessibility")
@@ -94,7 +84,9 @@ class CouponUseFragment : BaseDialogFragment() {
                     ViewGroup.LayoutParams.MATCH_PARENT,
                     ViewGroup.LayoutParams.MATCH_PARENT)
 
-            it.imageUrl.replaceObserve(this, Observer { imageUrl -> setImage(imageUrl) })
+            it.imageUrl.replaceObserve(this, Observer<String>(this::setImage))
+            it.onClose.observeOn(AndroidSchedulers.mainThread())
+                    .subscribe({ dismiss() }, { }).addBug(this.subscriptions)
             this.binding.viewModel = it
             it.addBug(this.subscriptions)
 

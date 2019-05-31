@@ -23,10 +23,6 @@ class UsedCouponListAdapter(viewModels: ObservableArrayList<UsedCouponListItemVi
         holder.update(this.viewModels[position])
     }
 
-    override fun getItemCount(): Int {
-        return this.viewModels.size
-    }
-
     class ViewHolder(root: View, private val owner: LifecycleOwner) : RecyclerView.ViewHolder(root) {
         val binding =
                 DataBindingUtil.bind<ItemUsedCouponListBinding>(root)!!.owner(this.owner)

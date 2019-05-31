@@ -15,8 +15,7 @@ abstract class LoginOperationViewModel(protected var userLogin: UserLogin) : Bas
 
     val onLoginExpired: Observable<LoginExpiredMessage> = this.messenger.register(LoginExpiredMessage::class.java)
 
-    protected fun doLoginExpired(throwable: Throwable, action: (() -> Unit)? = null) = doLoginExpired(throwable, action, true)
-    protected fun doLoginExpired(throwable: Throwable, action: (() -> Unit)? = null, isDoRequiredAction: Boolean): Boolean {
+    protected fun doLoginExpired(throwable: Throwable, action: (() -> Unit)? = null): Boolean {
         var isDoLoginExpired = false
         try {
             if (throwable is StudyAppException) {
@@ -25,24 +24,20 @@ abstract class LoginOperationViewModel(protected var userLogin: UserLogin) : Bas
                         isDoLoginExpired = true
                         this.userLogin.logout()
                                 .observeOn(AndroidSchedulers.mainThread())
-                                .subscribe(
-                                        {
-                                            action?.invoke()
-                                            sendLoginExpiredMessage()
-                                        },
-                                        {
-                                            action?.invoke()
-                                            sendLoginExpiredMessage()
-                                        }).addBug(this.subscriptions)
+                                .subscribe({
+                                    action?.invoke()
+                                    sendLoginExpiredMessage()
+                                }, {
+                                    action?.invoke()
+                                    sendLoginExpiredMessage()
+                                }).addBug(this.subscriptions)
                     }
-
-                    else -> if (isDoRequiredAction) action?.invoke()
+                    else -> {}
                 }
             }
         } catch (e: Exception) {
             isDoLoginExpired = false
         }
-
         return isDoLoginExpired
     }
 

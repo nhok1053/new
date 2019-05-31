@@ -213,6 +213,7 @@ class CouponListItemViewModel @Inject constructor(userLogin: UserLogin, private 
                 if (!doLoginExpired(it) { this._isLoading.postValue(false) }) {
                     val ex = if (it is StudyAppException) it else StudyAppException.fromThrowable(it)
                     this.onUseCouponErrorSubject.onNext(ex)
+                    this._isLoading.postValue(false)
                 }
             }).addBug(this.subscriptions)
         }

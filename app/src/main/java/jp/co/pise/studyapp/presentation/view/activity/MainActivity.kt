@@ -8,6 +8,7 @@ import android.support.v4.app.DialogFragment
 import android.support.v4.app.Fragment
 import android.support.v4.content.ContextCompat
 import android.support.v4.view.GravityCompat
+import android.support.v4.widget.DrawerLayout
 import android.support.v7.app.ActionBarDrawerToggle
 import android.support.v7.widget.Toolbar
 import android.widget.Toast
@@ -15,6 +16,7 @@ import dagger.android.AndroidInjection
 import dagger.android.AndroidInjector
 import dagger.android.DispatchingAndroidInjector
 import dagger.android.support.HasSupportFragmentInjector
+import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import jp.co.pise.studyapp.R
 import jp.co.pise.studyapp.databinding.ActivityMainBinding
@@ -26,9 +28,10 @@ import jp.co.pise.studyapp.framework.rx.LoginStateChangeMessage
 import jp.co.pise.studyapp.presentation.StudyApp
 import jp.co.pise.studyapp.presentation.view.customview.DrawerHeaderView
 import jp.co.pise.studyapp.presentation.view.fragment.BaseFragment
-import jp.co.pise.studyapp.presentation.view.fragment.CouponFragment
-import jp.co.pise.studyapp.presentation.view.fragment.NewsFragment
-import jp.co.pise.studyapp.presentation.view.fragment.ProductFragment
+import jp.co.pise.studyapp.presentation.view.fragment.BaseTabFragment
+import jp.co.pise.studyapp.presentation.view.fragment.tab.CouponTabFragment
+import jp.co.pise.studyapp.presentation.view.fragment.tab.NewsTabFragment
+import jp.co.pise.studyapp.presentation.view.fragment.tab.ProductTabFragment
 import jp.co.pise.studyapp.presentation.viewmodel.activity.MainActivityViewModel
 import javax.inject.Inject
 
@@ -91,30 +94,32 @@ class MainActivity : BaseActivity(), HasSupportFragmentInjector {
         (this.binding.toolbar as Toolbar?)?.let { toolbar ->
             setSupportActionBar(toolbar)
 
-            val toggle = ActionBarDrawerToggle(
+            val toggle = object : ActionBarDrawerToggle(
                     this, this.binding.drawerLayout,
                     toolbar,
                     R.string.drawer_open,
-                    R.string.drawer_close)
+                    R.string.drawer_close) {
+
+                override fun onDrawerStateChanged(newState: Int) {
+                    // ドラッグ開始、もしくはアニメーション開始（アイコンタップ時）の場合Dialogを閉じる
+                    if (newState == DrawerLayout.STATE_DRAGGING || newState == DrawerLayout.STATE_SETTLING)
+                        dismissDialogFragment()
+
+                    super.onDrawerStateChanged(newState)
+                }
+            }
             this.binding.drawerLayout.addDrawerListener(toggle)
             this.binding.drawerLayout.setScrimColor(ContextCompat.getColor(this, R.color.menuScrim))
             this.binding.navigationView.setNavigationItemSelectedListener { menuItem ->
                 when (menuItem.itemId) {
-                    R.id.usedCoupon -> {
-                    }
-
-                    R.id.privacyPolicy -> {
-                    }
-
-                    R.id.licenses -> {
-                    }
-
+                    R.id.usedCoupon -> { }
+                    R.id.privacyPolicy -> { }
+                    R.id.licenses -> { }
                     R.id.login -> startActivity(LoginActivity.createIntent(this))
-
                     R.id.logout -> this.viewModel.logout()
-
-                    R.id.refreshCoupon -> if (StudyApp.instance.isLoggedIn && StudyApp.instance.loginUser != null)
-                        this.viewModel.refreshUsedCoupon(StudyApp.instance.loginUser!!)
+                    R.id.refreshCoupon ->
+                        if (StudyApp.instance.isLoggedIn && StudyApp.instance.loginUser != null)
+                            this.viewModel.refreshUsedCoupon(StudyApp.instance.loginUser!!)
                 }
                 this.binding.drawerLayout.closeDrawer(GravityCompat.START)
                 true
@@ -125,9 +130,9 @@ class MainActivity : BaseActivity(), HasSupportFragmentInjector {
         // setting bottom navigation
         this.binding.bottomNavigation.setOnNavigationItemSelectedListener { menuItem ->
             when (menuItem.itemId) {
-                R.id.nav_news -> showNewsFragment()
-                R.id.nav_coupon -> showCouponFragment()
-                R.id.nav_product -> showProductFragment()
+                R.id.nav_news -> showNewsTab()
+                R.id.nav_coupon -> showCouponTab()
+                R.id.nav_product -> showProductTab()
             }
             true
         }
@@ -135,12 +140,12 @@ class MainActivity : BaseActivity(), HasSupportFragmentInjector {
         // 再生成でない場合のみ初期設定する
         if (savedInstanceState == null) {
             this.supportFragmentManager.beginTransaction()
-                    .add(R.id.container, createNewsFragment(), NewsFragment.TAG)
-                    .add(R.id.container, createCouponFragment(), CouponFragment.TAG)
-                    .add(R.id.container, createProductFragment(), ProductFragment.TAG)
+                    .add(R.id.container, createNewsTabFragment(), NewsTabFragment.TAG)
+                    .add(R.id.container, createCouponTabFragment(), CouponTabFragment.TAG)
+                    .add(R.id.container, createProductTabFragment(), ProductTabFragment.TAG)
                     .commitNow()
 
-            showNewsFragment()
+            showNewsTab()
         }
     }
 
@@ -182,19 +187,31 @@ class MainActivity : BaseActivity(), HasSupportFragmentInjector {
         }
     }
 
-    private fun showNewsFragment() {
+    private fun showNewsTab() {
         dismissDialogFragment()
-        showFragment<NewsFragment>()
+
+        if (supportActionBar != null)
+            supportActionBar!!.title = resources.getString(R.string.news_tab_title)
+
+        showFragment<NewsTabFragment>()
     }
 
-    private fun showCouponFragment() {
+    private fun showCouponTab() {
         dismissDialogFragment()
-        showFragment<CouponFragment>()
+
+        if (supportActionBar != null)
+            supportActionBar!!.title = resources.getString(R.string.coupon_tab_title)
+
+        showFragment<CouponTabFragment>()
     }
 
-    private fun showProductFragment() {
+    private fun showProductTab() {
         dismissDialogFragment()
-        showFragment<ProductFragment>()
+
+        if (supportActionBar != null)
+            supportActionBar!!.title = resources.getString(R.string.product_tab_title)
+
+        showFragment<ProductTabFragment>()
     }
 
     private inline fun <reified T : BaseFragment> showFragment() {
@@ -207,20 +224,26 @@ class MainActivity : BaseActivity(), HasSupportFragmentInjector {
         }
     }
 
-    private fun createNewsFragment(): NewsFragment {
-        return NewsFragment.newInstance()
+    private fun createNewsTabFragment(): NewsTabFragment {
+        return NewsTabFragment.newInstance()
     }
 
-    private fun createCouponFragment(): CouponFragment {
-        return CouponFragment.newInstance()
+    private fun createCouponTabFragment(): CouponTabFragment {
+        return CouponTabFragment.newInstance()
     }
 
-    private fun createProductFragment(): ProductFragment {
-        return ProductFragment.newInstance()
+    private fun createProductTabFragment(): ProductTabFragment {
+        return ProductTabFragment.newInstance()
     }
 
     private fun dismissDialogFragment() {
+        supportFragmentManager.executePendingTransactions()
         supportFragmentManager.fragments.forEach { if (it is DialogFragment) it.dismiss() }
+
+        supportFragmentManager.fragments
+                .filter { it is BaseTabFragment }
+                .map { it as BaseTabFragment }
+                .forEach(BaseTabFragment::dismissDialogFragment)
     }
 
     // endregion
@@ -229,6 +252,16 @@ class MainActivity : BaseActivity(), HasSupportFragmentInjector {
 
     override fun supportFragmentInjector(): AndroidInjector<Fragment>? {
         return this.fragmentInjector
+    }
+
+    override fun onBackPressed() {
+        val isPopBack = supportFragmentManager.fragments
+                .filter { it is BaseTabFragment && !it.isHidden }
+                .map { it as BaseTabFragment }
+                .firstOrNull()?.popBackStack() ?: false
+
+        if (!isPopBack)
+            super.onBackPressed()
     }
 
     // endregion

@@ -4,19 +4,25 @@ import android.arch.lifecycle.LifecycleOwner
 import android.arch.lifecycle.Observer
 import android.databinding.DataBindingUtil
 import android.databinding.ObservableArrayList
+import android.databinding.ObservableList
 import android.support.v7.widget.RecyclerView
 import android.text.TextUtils
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import io.reactivex.android.schedulers.AndroidSchedulers
 import jp.co.pise.studyapp.R
 import jp.co.pise.studyapp.databinding.ItemNewsListBinding
+import jp.co.pise.studyapp.extension.addBug
 import jp.co.pise.studyapp.extension.owner
 import jp.co.pise.studyapp.extension.replaceObserve
 import jp.co.pise.studyapp.extension.resizeFromDimen
 import jp.co.pise.studyapp.presentation.viewmodel.adapter.NewsListItemViewModel
 
 class NewsListAdapter(viewModels: ObservableArrayList<NewsListItemViewModel>, owner: LifecycleOwner) : BaseAdapter<NewsListItemViewModel, NewsListAdapter.ViewHolder>(viewModels, owner) {
+    init {
+        this.viewModels.forEach { this.setShowDetailCommand(it) }
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.item_news_list, parent, false)
@@ -27,8 +33,16 @@ class NewsListAdapter(viewModels: ObservableArrayList<NewsListItemViewModel>, ow
         holder.update(this.viewModels[position])
     }
 
-    override fun getItemCount(): Int {
-        return this.viewModels.size
+    override fun onListItemRangeInserted(sender: ObservableList<NewsListItemViewModel>, positionStart: Int, itemCount: Int) {
+        super.onListItemRangeInserted(sender, positionStart, itemCount)
+        (positionStart until itemCount).forEach { index ->
+            if (index < sender.size) sender[index]?.let { setShowDetailCommand(it) }
+        }
+    }
+
+    private fun setShowDetailCommand(viewModel: NewsListItemViewModel) {
+        viewModel.onShowDetail.observeOn(AndroidSchedulers.mainThread())
+                .subscribe(this::doItemClick) { }.addBug(this.subscriptions)
     }
 
     class ViewHolder(root: View, private val owner: LifecycleOwner) : RecyclerView.ViewHolder(root) {

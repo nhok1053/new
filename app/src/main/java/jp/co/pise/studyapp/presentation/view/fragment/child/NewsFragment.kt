@@ -1,40 +1,39 @@
-package jp.co.pise.studyapp.presentation.view.fragment
+package jp.co.pise.studyapp.presentation.view.fragment.child
 
 import android.arch.lifecycle.Observer
 import android.content.Context
 import android.databinding.DataBindingUtil
 import android.os.Bundle
-import android.support.v7.widget.GridLayoutManager
+import android.support.v7.widget.LinearLayoutManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import dagger.android.support.AndroidSupportInjection
 import io.reactivex.android.schedulers.AndroidSchedulers
 import jp.co.pise.studyapp.R
-import jp.co.pise.studyapp.databinding.FragmentProductBinding
-import jp.co.pise.studyapp.domain.model.ProductItemModel
+import jp.co.pise.studyapp.databinding.FragmentNewsBinding
+import jp.co.pise.studyapp.domain.model.GetNewsItemModel
 import jp.co.pise.studyapp.extension.addBug
 import jp.co.pise.studyapp.extension.owner
 import jp.co.pise.studyapp.extension.replaceObserve
 import jp.co.pise.studyapp.extension.unwrap
-import jp.co.pise.studyapp.presentation.view.adapter.ProductListAdapter
-import jp.co.pise.studyapp.presentation.view.fragment.dialog.ProductDetailFragment
-import jp.co.pise.studyapp.presentation.viewmodel.fragment.ProductFragmentViewModel
+import jp.co.pise.studyapp.presentation.view.adapter.NewsListAdapter
+import jp.co.pise.studyapp.presentation.view.fragment.BaseFragment
+import jp.co.pise.studyapp.presentation.view.fragment.BaseTabFragment
+import jp.co.pise.studyapp.presentation.viewmodel.fragment.child.NewsFragmentViewModel
 import javax.inject.Inject
 
-private const val SPAN_COUNT = 2
-
-class ProductFragment : BaseFragment() {
+class NewsFragment : BaseFragment() {
     @Inject
-    lateinit var viewModel: ProductFragmentViewModel
-    private lateinit var binding: FragmentProductBinding
-    private lateinit var adapter: ProductListAdapter
+    lateinit var viewModel: NewsFragmentViewModel
+    private lateinit var binding: FragmentNewsBinding
+    private lateinit var adapter: NewsListAdapter
 
     companion object {
-        const val TAG = "ProductFragment"
+        const val TAG = "NewsFragment"
 
-        fun newInstance(): ProductFragment {
-            return ProductFragment()
+        fun newInstance(): NewsFragment {
+            return NewsFragment()
         }
     }
 
@@ -52,7 +51,7 @@ class ProductFragment : BaseFragment() {
 
         // setting binding
         this.binding = DataBindingUtil
-                .inflate<FragmentProductBinding>(inflater, R.layout.fragment_product, container, false)
+                .inflate<FragmentNewsBinding>(inflater, R.layout.fragment_news, container, false)
                 .owner(this)
         this.binding.viewModel = this.viewModel
         this.viewModel.addBug(this.subscriptions)
@@ -61,16 +60,16 @@ class ProductFragment : BaseFragment() {
         this.binding.swipeRefresh.setOnRefreshListener { this.viewModel.refresh() }
 
         // setting adapter
-        this.adapter = ProductListAdapter(this.viewModel.productList, this)
-        this.binding.recyclerView.layoutManager = GridLayoutManager(context, SPAN_COUNT)
+        this.adapter = NewsListAdapter(this.viewModel.newsList, this)
+        this.binding.recyclerView.layoutManager = LinearLayoutManager(context)
         this.binding.recyclerView.adapter = this.adapter
         this.adapter.onItemClick.observeOn(AndroidSchedulers.mainThread())
-                .subscribe({ itemViewModel -> showProductDetail(itemViewModel.toItemModel()) }, { }).addBug(this.subscriptions)
+                .subscribe({ itemViewModel -> showNewsDetail(itemViewModel.toItemModel()) }, { }).addBug(this.subscriptions)
         this.adapter.addBug(this.subscriptions)
 
         // setting view model message
         this.viewModel.onLoginExpired.observeOn(AndroidSchedulers.mainThread())
-                .subscribe(this::doLoginExpired) { }.addBug(this.subscriptions)
+                .subscribe(this::doLoginExpired) {}.addBug(this.subscriptions)
         this.viewModel.isRefreshing.replaceObserve(this, Observer {
             if (!it.unwrap && binding.swipeRefresh.isRefreshing) {
                 binding.swipeRefresh.isRefreshing = false
@@ -82,12 +81,12 @@ class ProductFragment : BaseFragment() {
         return this.binding.root
     }
 
-    private fun showProductDetail(model: ProductItemModel) {
-        // Fragmentの表示をシングルトンにする為、既に表示されていた場合は閉じる
-        (fragmentManager?.findFragmentByTag(ProductDetailFragment.TAG) as ProductDetailFragment?)?.dismiss()
+    private fun showNewsDetail(model: GetNewsItemModel) {
+        (parentFragment as BaseTabFragment?)?.stackChildFragment(NewsDetailFragment.newInstance(model), CouponFragment.TAG)
+    }
 
-        val fragment = ProductDetailFragment.newInstance(model)
-        fragment.show(fragmentManager, ProductDetailFragment.TAG)
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {

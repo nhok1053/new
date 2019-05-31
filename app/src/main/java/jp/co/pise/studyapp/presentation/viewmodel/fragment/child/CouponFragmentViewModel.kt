@@ -1,4 +1,4 @@
-package jp.co.pise.studyapp.presentation.viewmodel.fragment
+package jp.co.pise.studyapp.presentation.viewmodel.fragment.child
 
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MutableLiveData
@@ -66,7 +66,10 @@ class CouponFragmentViewModel @Inject constructor(userLogin: UserLogin, private 
             }
             action?.invoke()
 
-        }, { t -> doLoginExpired(t, action) })
+        }, { t ->
+            if (!doLoginExpired(t, action))
+                action?.invoke()
+        })
         this.getCouponDisposable?.addBug(this.subscriptions)
     }
 

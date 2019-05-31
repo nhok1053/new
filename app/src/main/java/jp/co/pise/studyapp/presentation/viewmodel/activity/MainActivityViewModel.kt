@@ -50,7 +50,11 @@ class MainActivityViewModel @Inject constructor(userLogin: UserLogin, private va
                 this.onRefreshUsedCouponSubject.onNext(true)
                 this._isLoading.postValue(false)
             }, { t ->
-                doLoginExpired(t) {
+                val isDoLoginExpired = doLoginExpired(t) {
+                    this.onRefreshUsedCouponSubject.onNext(false)
+                    this._isLoading.postValue(false)
+                }
+                if (!isDoLoginExpired) {
                     this.onRefreshUsedCouponSubject.onNext(false)
                     this._isLoading.postValue(false)
                 }
