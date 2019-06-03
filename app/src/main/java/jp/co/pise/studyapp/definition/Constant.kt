@@ -21,6 +21,7 @@ object Message {
     const val LOGOUT = "ログアウトしました。"
 
     const val REFRESH_USED_COUPON_SUCCESS = "クーポン利用情報をリセットしました。"
+    const val REFRESH_USED_COUPON_FAILED = "クーポン利用情報のリセットに失敗しました。"
 
     const val USE_COUPON_ERROR = "クーポンの利用処理に失敗しました。"
 

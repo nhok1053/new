@@ -160,6 +160,8 @@ class MainActivity : BaseActivity(), HasSupportFragmentInjector {
         if (isSuccess) {
             StudyApp.instance.doRefreshedUsedCoupon()
             Toast.makeText(this, Message.REFRESH_USED_COUPON_SUCCESS, Toast.LENGTH_SHORT).show()
+        } else {
+            Toast.makeText(this, Message.REFRESH_USED_COUPON_FAILED, Toast.LENGTH_SHORT).show()
         }
     }
 
