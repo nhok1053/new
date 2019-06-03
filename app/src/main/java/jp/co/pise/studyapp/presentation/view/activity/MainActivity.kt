@@ -215,12 +215,13 @@ class MainActivity : BaseActivity(), HasSupportFragmentInjector {
     }
 
     private inline fun <reified T : BaseFragment> showFragment() {
+        supportFragmentManager.executePendingTransactions()
         this.supportFragmentManager.beginTransaction().apply {
             supportFragmentManager.fragments.forEach {
                 if (it is T) show(it)
                 else hide(it)
             }
-            commit()
+            commitNow()
         }
     }
 

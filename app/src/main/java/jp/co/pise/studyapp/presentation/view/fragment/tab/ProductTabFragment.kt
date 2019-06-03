@@ -48,7 +48,7 @@ class ProductTabFragment : BaseTabFragment() {
         // setting first fragment
         val transaction = childFragmentManager.beginTransaction()
         transaction.add(R.id.container, createProductFragment(), ProductFragment.TAG)
-        transaction.commit()
+        transaction.commitNow()
 
         return this.binding.root
     }

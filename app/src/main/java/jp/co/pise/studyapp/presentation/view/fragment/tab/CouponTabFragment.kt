@@ -51,7 +51,7 @@ class CouponTabFragment : BaseTabFragment() {
         // setting fragment
         val transaction = childFragmentManager.beginTransaction()
         transaction.add(R.id.container, createCouponFragment(), CouponFragment.TAG)
-        transaction.commit()
+        transaction.commitNow()
 
         return this.binding.root
     }

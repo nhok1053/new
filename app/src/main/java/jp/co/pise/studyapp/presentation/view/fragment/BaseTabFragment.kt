@@ -1,19 +1,24 @@
 package jp.co.pise.studyapp.presentation.view.fragment
 
+import android.support.annotation.IdRes
 import android.support.v4.app.DialogFragment
 import android.support.v4.app.Fragment
 import jp.co.pise.studyapp.R
 
 abstract class BaseTabFragment : BaseFragment() {
-    fun stackChildFragment(fragment: Fragment, tag: String, isRemove: Boolean = true) {
-        val transaction = childFragmentManager.beginTransaction()
+    @IdRes
+    protected var containerId = R.id.container
 
-        if (isRemove)
-            childFragmentManager.findFragmentByTag(tag)?.let { transaction.remove(it) }
+    fun stackChildFragment(fragment: Fragment, tag: String, isSingleton: Boolean = true) {
+        childFragmentManager.executePendingTransactions()
+        if (isSingleton)
+            childFragmentManager.findFragmentByTag(tag)?.let { childFragmentManager.beginTransaction().remove(it).commitNow() }
 
-        transaction.addToBackStack(null)
-        transaction.add(R.id.container, fragment, tag)
-        transaction.commit()
+        childFragmentManager.beginTransaction().apply {
+            addToBackStack(null)
+            add(containerId, fragment, tag)
+            commit()
+        }
     }
 
     fun dismissDialogFragment() {
@@ -26,6 +31,7 @@ abstract class BaseTabFragment : BaseFragment() {
 
     fun popBackStack(): Boolean {
         var isDoBack = false
+        childFragmentManager.executePendingTransactions()
         if (childFragmentManager.fragments.size > 1) {
             // 最後のFragmentじゃなければ、popBackStackを実行
             childFragmentManager.popBackStackImmediate()

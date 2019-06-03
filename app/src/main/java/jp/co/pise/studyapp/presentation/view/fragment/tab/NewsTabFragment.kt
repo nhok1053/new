@@ -51,7 +51,7 @@ class NewsTabFragment : BaseTabFragment() {
         // setting fragment
         val transaction = childFragmentManager.beginTransaction()
         transaction.add(R.id.container, createNewsFragment(), NewsFragment.TAG)
-        transaction.commit()
+        transaction.commitNow()
 
         return this.binding.root
     }

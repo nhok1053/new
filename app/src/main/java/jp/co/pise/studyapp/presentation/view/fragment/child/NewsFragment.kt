@@ -82,7 +82,7 @@ class NewsFragment : BaseFragment() {
     }
 
     private fun showNewsDetail(model: GetNewsItemModel) {
-        (parentFragment as BaseTabFragment?)?.stackChildFragment(NewsDetailFragment.newInstance(model), CouponFragment.TAG)
+        (parentFragment as BaseTabFragment?)?.stackChildFragment(NewsDetailFragment.newInstance(model), NewsDetailFragment.TAG)
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
