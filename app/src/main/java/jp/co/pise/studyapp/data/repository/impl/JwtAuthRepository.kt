@@ -16,13 +16,16 @@ import retrofit2.Response
 import java.net.HttpURLConnection
 
 abstract class JwtAuthRepository constructor(val userApi: UserApiInterface, val db: OrmaDatabase) : BaseRepository() {
+
     /**
+     * Bearer認証付きのAPIをコールし、Http Status Codeが401、またはbodyのresultCodeが3（TokenExpired）の場合、
+     * トークンをリフレッシュを行い、再度Bearer認証付きのAPIをコールするメソッド
      *
      * @param model Apiのコールに使用するModel
      * @param <M> funcの引数の型
      * @param <R> Apiの返却の型
      * @return funcを実施した結果がトークン期限切れの場合、トークンをリフレッシュしてから再度更新するSingle
-    </R></M> */
+     */
     protected fun <M : JwtAuthChallengeModel, R : ApiResultModel> ((M) -> Single<Response<R>>).callWithTokenRefresh(model: M): Single<Response<R>> {
         return Single.create { emitter ->
             this(model).subscribe({

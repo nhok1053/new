@@ -16,7 +16,6 @@ import dagger.android.AndroidInjection
 import dagger.android.AndroidInjector
 import dagger.android.DispatchingAndroidInjector
 import dagger.android.support.HasSupportFragmentInjector
-import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import jp.co.pise.studyapp.R
 import jp.co.pise.studyapp.databinding.ActivityMainBinding
@@ -179,8 +178,7 @@ class MainActivity : BaseActivity(), HasSupportFragmentInjector {
     }
 
     private fun settingDrawerMenu(isLogin: Boolean, loginUser: LoginUser?) {
-        if (this.binding.navigationView.menu != null)
-            this.binding.navigationView.menu.clear()
+        this.binding.navigationView.menu?.clear()
 
         if (isLogin && loginUser != null) {
             this.binding.navigationView.inflateMenu(R.menu.login_drawer_item)
@@ -191,28 +189,19 @@ class MainActivity : BaseActivity(), HasSupportFragmentInjector {
 
     private fun showNewsTab() {
         dismissDialogFragment()
-
-        if (supportActionBar != null)
-            supportActionBar!!.title = resources.getString(R.string.news_tab_title)
-
+        supportActionBar?.title = getString(R.string.news_tab_title)
         showFragment<NewsTabFragment>()
     }
 
     private fun showCouponTab() {
         dismissDialogFragment()
-
-        if (supportActionBar != null)
-            supportActionBar!!.title = resources.getString(R.string.coupon_tab_title)
-
+        supportActionBar?.title = getString(R.string.coupon_tab_title)
         showFragment<CouponTabFragment>()
     }
 
     private fun showProductTab() {
         dismissDialogFragment()
-
-        if (supportActionBar != null)
-            supportActionBar!!.title = resources.getString(R.string.product_tab_title)
-
+        supportActionBar?.title = getString(R.string.product_tab_title)
         showFragment<ProductTabFragment>()
     }
 

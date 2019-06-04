@@ -21,13 +21,7 @@ class NewsDisplay @Inject constructor(private val newsRepository: INewsRepositor
             this.newsRepository.getNews().flatMap<GetNewsResult> { getNewsResult ->
                 Single.create { emitter ->
                     try {
-                        val news: List<News> = if (getNewsResult.news != null) {
-                            Observable.fromIterable<GetNewsItemModel>(getNewsResult.news)
-                                    .map { it.toEntity() }
-                                    .toList().blockingGet()
-                        } else {
-                            ArrayList()
-                        }
+                        val news: List<News> = getNewsResult.news?.map{ it.toEntity() }?.toList() ?: arrayListOf()
                         val challenge = SaveNewsChallenge(news)
                         this.newsRepository.saveNews(challenge)
                                 .subscribe({ emitter.onSuccess(getNewsResult) }, emitter::onSafeError).addBug(this.subscriptions)

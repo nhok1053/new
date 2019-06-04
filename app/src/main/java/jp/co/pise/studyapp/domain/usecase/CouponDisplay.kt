@@ -1,7 +1,6 @@
 package jp.co.pise.studyapp.domain.usecase
 
 import io.reactivex.Single
-import io.reactivex.annotations.NonNull
 import jp.co.pise.studyapp.data.repository.GetCouponParam
 import jp.co.pise.studyapp.data.repository.ICouponRepository
 import jp.co.pise.studyapp.data.repository.IUserRepository

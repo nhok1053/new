@@ -49,12 +49,8 @@ class NewsFragmentViewModel @Inject constructor(userLogin: UserLogin, private va
     }
 
     private fun getNewsList(action: (() -> Unit)?) {
-        if (this.getNewsDisposable != null) {
-            if (!this.getNewsDisposable!!.isDisposed)
-                this.getNewsDisposable?.dispose()
-
-            this.getNewsDisposable = null
-        }
+        this.getNewsDisposable?.dispose()
+        this.getNewsDisposable = null
 
         this.newsList.clear()
         this.getNewsDisposable = this.newsDisplay.getNews().observeOn(AndroidSchedulers.mainThread()).subscribe({ result ->

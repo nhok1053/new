@@ -47,12 +47,8 @@ class CouponFragmentViewModel @Inject constructor(userLogin: UserLogin, private 
     }
 
     private fun getCoupon(isLogin: Boolean, loginUser: LoginUser?, action: (() -> Unit)?) {
-        if (this.getCouponDisposable != null) {
-            if (!this.getCouponDisposable!!.isDisposed)
-                this.getCouponDisposable?.dispose()
-
-            this.getCouponDisposable = null
-        }
+        this.getCouponDisposable?.dispose()
+        this.getCouponDisposable = null
 
         this.couponList.clear()
         val model = GetCouponChallenge(isLogin, loginUser)

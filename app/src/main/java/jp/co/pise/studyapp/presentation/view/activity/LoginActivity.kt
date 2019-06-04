@@ -5,9 +5,11 @@ import android.content.Intent
 import android.databinding.DataBindingUtil
 import android.os.Bundle
 import android.support.v7.widget.Toolbar
+import android.view.MotionEvent
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import dagger.android.AndroidInjection
+import io.reactivex.android.schedulers.AndroidSchedulers
 import jp.co.pise.studyapp.R
 import jp.co.pise.studyapp.databinding.ActivityLoginBinding
 import jp.co.pise.studyapp.definition.Message
@@ -21,6 +23,12 @@ class LoginActivity : BaseActivity() {
     @Inject
     lateinit var viewModel: LoginActivityViewModel
     lateinit var binding: ActivityLoginBinding
+
+    companion object {
+        fun createIntent(context: Context): Intent {
+            return Intent(context, LoginActivity::class.java)
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         AndroidInjection.inject(this)
@@ -38,15 +46,6 @@ class LoginActivity : BaseActivity() {
             setSupportActionBar(it)
         }
 
-        // setting listener
-        this.binding.content.setOnClickListener {
-            val currentFocus = currentFocus
-            if (currentFocus != null) {
-                val manager = this.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-                manager.hideSoftInputFromWindow(currentFocus.windowToken, InputMethodManager.HIDE_NOT_ALWAYS)
-            }
-        }
-
         subscribe()
     }
 
@@ -59,16 +58,18 @@ class LoginActivity : BaseActivity() {
     }
 
     private fun subscribe() {
-        this.viewModel.onLogin.subscribe({ result ->
+        this.viewModel.onLogin.observeOn(AndroidSchedulers.mainThread()).subscribe({ result ->
             StudyApp.instance.login(result)
             Toast.makeText(this, Message.LOGIN, Toast.LENGTH_SHORT).show()
             finish()
         }, { }).addBug(this.subscriptions)
     }
 
-    companion object {
-        fun createIntent(context: Context): Intent {
-            return Intent(context, LoginActivity::class.java)
+    override fun onTouchEvent(event: MotionEvent?): Boolean {
+        if (currentFocus != null) {
+            val manager = this.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+            manager.hideSoftInputFromWindow(currentFocus!!.windowToken, InputMethodManager.HIDE_NOT_ALWAYS)
         }
+        return super.onTouchEvent(event)
     }
 }

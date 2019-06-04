@@ -43,12 +43,8 @@ class ProductFragmentViewModel @Inject constructor(userLogin: UserLogin, private
     }
 
     fun getProduct(action: (() -> Unit)?) {
-        if (this.getProductDisposable != null) {
-            if (!this.getProductDisposable!!.isDisposed)
-                this.getProductDisposable?.dispose()
-
-            this.getProductDisposable = null
-        }
+        this.getProductDisposable?.dispose()
+        this.getProductDisposable = null
 
         this.productList.clear()
         this.getProductDisposable = this.productDisplay.getProduct().observeOn(AndroidSchedulers.mainThread()).subscribe({ result ->
