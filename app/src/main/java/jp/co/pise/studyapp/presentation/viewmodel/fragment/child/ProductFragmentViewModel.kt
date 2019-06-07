@@ -48,10 +48,9 @@ class ProductFragmentViewModel @Inject constructor(userLogin: UserLogin, private
 
         this.productList.clear()
         this.getProductDisposable = this.productDisplay.getProduct().observeOn(AndroidSchedulers.mainThread()).subscribe({ result ->
-            result.products?.map {
-                ProductListItemViewModel.fromResultItem(it)
-            }?.toList()?.let {
-                productList.addAll(it)
+            result.products?.let { products ->
+                products.map { ProductListItemViewModel.fromResultItem(it) }
+                        .let { productList.addAll(it) }
             }
             action?.invoke()
         }, { t ->

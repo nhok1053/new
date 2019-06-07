@@ -53,12 +53,10 @@ class CouponFragmentViewModel @Inject constructor(userLogin: UserLogin, private 
         this.couponList.clear()
         val model = GetCouponChallenge(isLogin, loginUser)
         this.getCouponDisposable = this.couponDisplay.getCoupon(model).observeOn(AndroidSchedulers.mainThread()).subscribe({ result ->
-            result.coupons?.sortedBy {
-                it.sortOrder
-            }?.map {
-                CouponListItemViewModel.fromResultItem(it, isLogin, loginUser)
-            }?.toList()?.let {
-                couponList.addAll(it)
+            result.coupons?.let { coupons ->
+                coupons.sortedBy { it.sortOrder }
+                        .map { CouponListItemViewModel.fromResultItem(it, isLogin, loginUser) }
+                        .let { couponList.addAll(it) }
             }
             action?.invoke()
 

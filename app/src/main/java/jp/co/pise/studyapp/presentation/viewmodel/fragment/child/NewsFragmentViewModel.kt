@@ -54,12 +54,10 @@ class NewsFragmentViewModel @Inject constructor(userLogin: UserLogin, private va
 
         this.newsList.clear()
         this.getNewsDisposable = this.newsDisplay.getNews().observeOn(AndroidSchedulers.mainThread()).subscribe({ result ->
-            result.news?.sortedBy {
-                it.sortOrder
-            }?.map {
-                NewsListItemViewModel.fromResultItem(it)
-            }?.toList()?.let {
-                newsList.addAll(it)
+            result.news?.let { news ->
+                news.sortedBy { it.sortOrder }
+                        .map { NewsListItemViewModel.fromResultItem(it) }
+                        .let { newsList.addAll(it) }
             }
             action?.invoke()
         }, { t ->
